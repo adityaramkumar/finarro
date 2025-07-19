@@ -69,6 +69,7 @@ const DashboardPage = () => {
       setIsSharing(true);
       console.log('Share button clicked, netWorthData:', netWorthData);
       
+      if (!netWorthData || netWorthData.length === 0) {
         console.log('No net worth data available');
         toast.error('No data available to share');
         return;
