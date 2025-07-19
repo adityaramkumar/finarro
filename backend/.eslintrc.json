@@ -25,11 +25,5 @@
     "no-alert": "warn",
     "no-debugger": "error"
   },
-  "ignorePatterns": [
-    "node_modules/",
-    "dist/", 
-    "logs/",
-    "uploads/",
-    "*.json"
-  ]
+  "ignorePatterns": ["node_modules/", "dist/", "logs/", "uploads/", "*.json"]
 }

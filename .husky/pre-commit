@@ -1,8 +1,7 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
+#!/bin/sh
 
-# Run lint-staged for frontend
-cd frontend && npx lint-staged
+# Run formatting and linting for frontend
+cd frontend && npm run format:lint
 
-# Run lint-staged for backend  
-cd ../backend && npx lint-staged
+# Run formatting and linting for backend  
+cd ../backend && npm run format:lint
