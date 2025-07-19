@@ -48,7 +48,7 @@ const LandingPage = () => {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative py-32 overflow-hidden bg-gray-900">
+      <section className="relative py-16 md:py-24 lg:py-32 overflow-hidden bg-gray-900">
         
         <div className="relative max-w-7xl mx-auto px-6 text-center">
           <div className="mb-6">
@@ -106,7 +106,7 @@ const LandingPage = () => {
       </section>
 
       {/* How It Works Section */}
-      <section className="py-32 bg-gray-950 relative">
+      <section className="py-16 md:py-24 lg:py-32 bg-gray-950 relative">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-20">
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
@@ -167,7 +167,7 @@ const LandingPage = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-32 bg-gray-900 relative">
+      <section className="py-16 md:py-24 lg:py-32 bg-gray-900 relative">
         <div className="max-w-7xl mx-auto px-6">
                      <div className="text-center mb-20">
              <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
@@ -228,7 +228,7 @@ const LandingPage = () => {
              
 
              {/* Final CTA Section */}
-       <section className="py-32 bg-gray-950">
+       <section className="py-16 md:py-24 lg:py-32 bg-gray-950">
          <div className="max-w-7xl mx-auto px-6">
                      <div className="bg-gradient-to-r from-indigo-900/50 to-purple-900/50 backdrop-blur border border-indigo-500/20 rounded-3xl p-12 text-center">
             <div className="mb-8">
