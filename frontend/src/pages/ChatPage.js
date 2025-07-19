@@ -200,7 +200,7 @@ const ChatPage = () => {
                 </h1>
                 <p className="text-sm text-gray-400 flex items-center">
                   <Sparkles className="h-3 w-3 mr-1 text-indigo-400" />
-                  Powered by advanced AI • Always learning
+                  Powered by finarro
                 </p>
               </div>
             </div>

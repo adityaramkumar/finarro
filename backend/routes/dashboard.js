@@ -263,25 +263,6 @@ router.get('/', auth, async (req, res) => {
           liabilities: Math.round(historicalLiabilities),
         });
       }
-    } else {
-      // Generate sample data even if no accounts exist
-      const baseNetWorth = 25000;
-      for (let i = 5; i >= 0; i--) {
-        const monthDate = new Date();
-        monthDate.setMonth(monthDate.getMonth() - i);
-
-        const growthFactor = 1 + 0.03 * (5 - i); // 3% monthly growth
-        const netWorth = Math.round(baseNetWorth * growthFactor);
-        const assets = Math.round(netWorth * 1.2); // 20% more assets than net worth
-        const liabilities = assets - netWorth;
-
-        netWorthData.push({
-          name: monthDate.toLocaleDateString('en-US', { month: 'short' }),
-          netWorth: netWorth,
-          assets: assets,
-          liabilities: liabilities,
-        });
-      }
     }
 
     // Calculate investment returns (simplified - in production you'd have actual investment data)

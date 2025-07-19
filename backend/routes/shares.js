@@ -131,52 +131,6 @@ const generateNetWorthDataForTimeframes = async userId => {
           liabilities: Math.round(historicalLiabilities),
         });
       }
-    } else {
-      // Generate sample data for each timeframe
-      const baseNetWorth = 25000;
-      const dataPoints = timeframe === '7d' ? 7 : timeframe === '1y' ? 12 : 6;
-
-      for (let i = dataPoints - 1; i >= 0; i--) {
-        const pointDate = new Date();
-
-        if (timeframe === '7d') {
-          pointDate.setDate(pointDate.getDate() - i);
-        } else if (timeframe === '1y') {
-          pointDate.setMonth(pointDate.getMonth() - i);
-        } else {
-          pointDate.setDate(
-            pointDate.getDate() - i * (timeframe === '30d' ? 5 : 15)
-          );
-        }
-
-        const growthFactor = 1 + 0.02 * (dataPoints - 1 - i); // 2% growth per period
-        const netWorth = Math.round(baseNetWorth * growthFactor);
-        const assets = Math.round(netWorth * 1.2);
-        const liabilities = assets - netWorth;
-
-        let nameFormat;
-        if (timeframe === '7d') {
-          nameFormat = pointDate.toLocaleDateString('en-US', {
-            weekday: 'short',
-          });
-        } else if (timeframe === '1y') {
-          nameFormat = pointDate.toLocaleDateString('en-US', {
-            month: 'short',
-          });
-        } else {
-          nameFormat = pointDate.toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-          });
-        }
-
-        netWorthData.push({
-          name: nameFormat,
-          netWorth: netWorth,
-          assets: assets,
-          liabilities: liabilities,
-        });
-      }
     }
 
     allData[timeframe] = netWorthData;

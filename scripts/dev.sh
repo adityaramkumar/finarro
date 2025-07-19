@@ -42,6 +42,7 @@ show_menu() {
     echo "  check     - Check environment setup"
     echo "  start     - Start development environment"
     echo "  test      - Test the application"
+    echo "  format    - Format code (Prettier + ESLint)"
     echo ""
     echo "Detailed Commands:"
     echo "  env       - Environment management"
@@ -69,6 +70,30 @@ main() {
         "test")
             log_info "Running tests..."
             scripts/test-local.sh ${2:-quick}
+            ;;
+        "format")
+            log_info "🎨 Formatting code..."
+            echo ""
+            
+            # Format frontend
+            log_info "Formatting frontend..."
+            cd frontend
+            npm run format:lint || {
+                log_error "Frontend formatting failed"
+                exit 1
+            }
+            cd ..
+            
+            # Format backend
+            log_info "Formatting backend..."
+            cd backend
+            npm run format:lint || {
+                log_error "Backend formatting failed"
+                exit 1
+            }
+            cd ..
+            
+            log_success "✅ Code formatting completed successfully!"
             ;;
             
         # Detailed commands

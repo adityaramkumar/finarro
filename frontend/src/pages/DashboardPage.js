@@ -29,6 +29,7 @@ import {
 import { dashboardApi, sharesApi } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'react-hot-toast';
+import PlaidLink from '../components/PlaidLink';
 
 const DashboardPage = () => {
   const { user } = useAuth();
@@ -54,6 +55,32 @@ const DashboardPage = () => {
   const transactions = data.transactions || [];
   const spendingByCategory = data.spending_by_category || [];
   const netWorthData = data.net_worth_data || [];
+
+  // Handle successful Plaid connection
+  const handlePlaidSuccess = () => {
+    // Refetch dashboard data to show new accounts
+    window.location.reload();
+  };
+
+  // Handle Plaid connection error
+  const handlePlaidError = error => {
+    // Error handling - could show toast notification if needed
+  };
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-96">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500 mx-auto mb-4"></div>
+          <p className="text-gray-400">Loading your financial data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Helper to check if we have any real data
+  const hasData = accounts.length > 0;
 
   // Helper function for currency formatting
   const formatCurrency = amount => {
@@ -157,10 +184,12 @@ const DashboardPage = () => {
             <option value="90d">Last 90 days</option>
             <option value="1y">Last year</option>
           </select>
-          <button className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-2.5 rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 flex items-center space-x-2 shadow-lg hover:shadow-xl hover:shadow-indigo-500/25 hover:scale-105 active:scale-95">
-            <Plus className="h-4 w-4" />
-            <span>Add Account</span>
-          </button>
+          <PlaidLink onSuccess={handlePlaidSuccess} onError={handlePlaidError}>
+            <button className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-2.5 rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 flex items-center space-x-2 shadow-lg hover:shadow-xl hover:shadow-indigo-500/25 hover:scale-105 active:scale-95">
+              <Plus className="h-4 w-4" />
+              <span>Add Account</span>
+            </button>
+          </PlaidLink>
         </div>
       </div>
 
@@ -179,8 +208,10 @@ const DashboardPage = () => {
                 <p className="text-xl font-bold text-white">
                   {isLoading ? (
                     <div className="h-6 w-20 bg-gray-700/50 rounded animate-pulse"></div>
-                  ) : (
+                  ) : hasData ? (
                     formatCurrency(summary.total_balance || 0)
+                  ) : (
+                    '$0.00'
                   )}
                 </p>
               </div>
@@ -215,8 +246,10 @@ const DashboardPage = () => {
                 <p className="text-xl font-bold text-white">
                   {isLoading ? (
                     <div className="h-6 w-20 bg-gray-700/50 rounded animate-pulse"></div>
-                  ) : (
+                  ) : hasData ? (
                     formatCurrency(summary.monthly_income || 0)
+                  ) : (
+                    '$0.00'
                   )}
                 </p>
               </div>
@@ -718,23 +751,57 @@ const DashboardPage = () => {
               View All
             </button>
           </div>
-          {accounts.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-64 text-center">
-              <div className="p-4 bg-gray-800/30 rounded-full mb-4">
-                <CreditCard className="h-12 w-12 text-gray-500" />
-              </div>
-              <h3 className="text-lg font-semibold text-white mb-2">
-                No Accounts Connected
-              </h3>
-              <p className="text-gray-400 max-w-md">
-                Connect your bank accounts to track balances and see your
-                complete financial picture.
-              </p>
-              <div className="mt-6">
-                <button className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors">
-                  Connect Account
-                </button>
-              </div>
+          {!hasData ? (
+            <div className="space-y-4">
+              {/* Placeholder accounts */}
+              {[
+                {
+                  name: 'Connect your checking account',
+                  type: 'checking',
+                  icon: '🏦',
+                },
+                {
+                  name: 'Connect your savings account',
+                  type: 'savings',
+                  icon: '🏛️',
+                },
+                {
+                  name: 'Connect your credit card',
+                  type: 'credit',
+                  icon: '💳',
+                },
+              ].map((placeholder, index) => (
+                <div
+                  key={index}
+                  className="group flex items-center justify-between p-5 bg-gray-800/10 rounded-xl border-2 border-dashed border-gray-700/30 hover:border-indigo-500/30 transition-all duration-300"
+                >
+                  <div className="flex items-center space-x-4">
+                    <div className="h-14 w-14 bg-gradient-to-br from-gray-600/20 to-gray-700/20 rounded-xl flex items-center justify-center">
+                      <span className="text-2xl opacity-50">
+                        {placeholder.icon}
+                      </span>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-semibold text-gray-400 truncate text-base">
+                        {placeholder.name}
+                      </p>
+                      <p className="text-sm text-gray-500 capitalize mt-1">
+                        {placeholder.type} account
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <PlaidLink
+                      onSuccess={handlePlaidSuccess}
+                      onError={handlePlaidError}
+                    >
+                      <button className="px-4 py-2 bg-indigo-600/80 hover:bg-indigo-600 text-white rounded-lg transition-colors text-sm">
+                        Connect
+                      </button>
+                    </PlaidLink>
+                  </div>
+                </div>
+              ))}
             </div>
           ) : (
             <div className="space-y-4">
@@ -783,22 +850,75 @@ const DashboardPage = () => {
               View All
             </button>
           </div>
-          {transactions.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-64 text-center">
-              <div className="p-4 bg-gray-800/30 rounded-full mb-4">
-                <TrendingUp className="h-12 w-12 text-gray-500" />
-              </div>
-              <h3 className="text-lg font-semibold text-white mb-2">
-                No Transactions Yet
-              </h3>
-              <p className="text-gray-400 max-w-md">
-                Start tracking your financial activity by adding transactions or
-                connecting accounts.
-              </p>
-              <div className="mt-6">
-                <button className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors">
-                  Add Transaction
-                </button>
+          {!hasData ? (
+            <div className="space-y-3">
+              {/* Placeholder transactions */}
+              {[
+                {
+                  name: 'Salary deposit will appear here',
+                  amount: '+$0.00',
+                  category: 'Income',
+                  icon: '💰',
+                },
+                {
+                  name: 'Your purchases will show here',
+                  amount: '-$0.00',
+                  category: 'Shopping',
+                  icon: '🛍️',
+                },
+                {
+                  name: 'Coffee and dining expenses',
+                  amount: '-$0.00',
+                  category: 'Food',
+                  icon: '☕',
+                },
+                {
+                  name: 'Monthly subscriptions',
+                  amount: '-$0.00',
+                  category: 'Services',
+                  icon: '📱',
+                },
+                {
+                  name: 'Investment contributions',
+                  amount: '-$0.00',
+                  category: 'Investment',
+                  icon: '📈',
+                },
+              ].map((placeholder, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between p-4 bg-gray-800/10 rounded-xl border border-gray-700/20 opacity-50"
+                >
+                  <div className="flex items-center space-x-4">
+                    <div className="h-12 w-12 bg-gray-700/20 rounded-xl flex items-center justify-center">
+                      <span className="text-lg">{placeholder.icon}</span>
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-400 text-sm">
+                        {placeholder.name}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {placeholder.category}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-semibold text-gray-500 text-sm">
+                      {placeholder.amount}
+                    </p>
+                    <p className="text-xs text-gray-600">Pending connection</p>
+                  </div>
+                </div>
+              ))}
+              <div className="text-center pt-4">
+                <PlaidLink
+                  onSuccess={handlePlaidSuccess}
+                  onError={handlePlaidError}
+                >
+                  <button className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl transition-all duration-200 shadow-lg hover:shadow-indigo-500/25 font-medium">
+                    Connect Account to See Real Transactions
+                  </button>
+                </PlaidLink>
               </div>
             </div>
           ) : (

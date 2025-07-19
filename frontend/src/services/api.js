@@ -108,11 +108,12 @@ export const documentsApi = {
 
 // Plaid API
 export const plaidApi = {
-  createLinkToken: () => api.post('/plaid/create-link-token'),
+  createLinkToken: () => api.post('/plaid/link/token/create'),
   exchangePublicToken: publicToken =>
-    api.post('/plaid/exchange-public-token', { publicToken }),
-  getAccounts: () => api.get('/plaid/accounts'),
-  getTransactions: params => api.get('/plaid/transactions', { params }),
+    api.post('/plaid/link/token/exchange', { public_token: publicToken }),
+  syncTransactions: () => api.post('/plaid/sync/transactions'),
+  getAccountBalances: () => api.get('/plaid/accounts/balances'),
+  removeAccount: accountId => api.delete(`/plaid/accounts/${accountId}`),
 };
 
 // Subscription API

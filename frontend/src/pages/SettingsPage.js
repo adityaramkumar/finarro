@@ -18,6 +18,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'react-hot-toast';
 import { subscriptionApi, userApi } from '../services/api';
 import SubscriptionUpgrade from '../components/SubscriptionUpgrade';
+import PlaidLink from '../components/PlaidLink';
 
 const SettingsPage = () => {
   const { user } = useAuth();
@@ -54,36 +55,22 @@ const SettingsPage = () => {
     marketingEmails: false,
   });
 
-  const linkedAccounts = [
-    {
-      id: 1,
-      name: 'Chase Bank',
-      type: 'Checking',
-      last4: '1234',
-      connected: true,
-    },
-    {
-      id: 2,
-      name: 'Wells Fargo',
-      type: 'Savings',
-      last4: '5678',
-      connected: true,
-    },
-    {
-      id: 3,
-      name: 'American Express',
-      type: 'Credit Card',
-      last4: '9012',
-      connected: true,
-    },
-    {
-      id: 4,
-      name: 'Fidelity',
-      type: 'Investment',
-      last4: '3456',
-      connected: false,
-    },
-  ];
+  const [linkedAccounts, setLinkedAccounts] = useState([]);
+
+  // Load linked accounts from API
+  useEffect(() => {
+    const loadLinkedAccounts = async () => {
+      try {
+        // Note: This would be an API call to get user's connected accounts
+        // For now, we'll show empty state since no real Plaid accounts are connected
+        setLinkedAccounts([]);
+      } catch (error) {
+        setLinkedAccounts([]);
+      }
+    };
+
+    loadLinkedAccounts();
+  }, []);
 
   // Load subscription data
   useEffect(() => {
@@ -695,12 +682,17 @@ const SettingsPage = () => {
                     </div>
                   </div>
                 ))}
-                <button className="w-full border-2 border-dashed border-gray-600/50 hover:border-gray-500/50 rounded-2xl p-8 text-center text-gray-400 hover:text-white transition-all duration-300 hover:bg-gray-800/20 group">
-                  <div className="p-4 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-2xl inline-block mb-4 group-hover:from-indigo-500/30 group-hover:to-purple-500/30 transition-colors">
-                    <Plus className="h-8 w-8 mx-auto text-indigo-400" />
-                  </div>
-                  <p className="text-lg font-medium">Add New Account</p>
-                </button>
+                <PlaidLink
+                  onSuccess={() => window.location.reload()}
+                  onError={() => {}}
+                >
+                  <button className="w-full border-2 border-dashed border-gray-600/50 hover:border-gray-500/50 rounded-2xl p-8 text-center text-gray-400 hover:text-white transition-all duration-300 hover:bg-gray-800/20 group">
+                    <div className="p-4 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-2xl inline-block mb-4 group-hover:from-indigo-500/30 group-hover:to-purple-500/30 transition-colors">
+                      <Plus className="h-8 w-8 mx-auto text-indigo-400" />
+                    </div>
+                    <p className="text-lg font-medium">Add New Account</p>
+                  </button>
+                </PlaidLink>
               </div>
             </div>
           )}
