@@ -8,16 +8,16 @@ const router = express.Router();
 // Get all transactions for user with filtering and search
 router.get('/', auth, async (req, res) => {
   try {
-    const { 
-      page = 1, 
-      limit = 50, 
-      category, 
-      account_id, 
+    const {
+      page = 1,
+      limit = 50,
+      category,
+      account_id,
       timeframe = '30d',
       search,
-      type // income, expense, all
+      type, // income, expense, all
     } = req.query;
-    
+
     const offset = (page - 1) * limit;
 
     // Calculate date filter
@@ -69,10 +69,10 @@ router.get('/', auth, async (req, res) => {
     }
 
     if (search) {
-      query = query.where(function() {
+      query = query.where(function () {
         this.where('transactions.name', 'ilike', `%${search}%`)
-            .orWhere('transactions.merchant_name', 'ilike', `%${search}%`)
-            .orWhere('transactions.category_primary', 'ilike', `%${search}%`);
+          .orWhere('transactions.merchant_name', 'ilike', `%${search}%`)
+          .orWhere('transactions.category_primary', 'ilike', `%${search}%`);
       });
     }
 
@@ -83,7 +83,7 @@ router.get('/', auth, async (req, res) => {
       .join('accounts', 'transactions.account_id', 'accounts.id')
       .where('accounts.user_id', req.user.id)
       .where('transactions.date', '>=', dateFilter);
-    
+
     if (category && category !== 'all') {
       countQuery.where('transactions.category_primary', category);
     }
@@ -96,10 +96,10 @@ router.get('/', auth, async (req, res) => {
       countQuery.where('transactions.amount', '<', 0);
     }
     if (search) {
-      countQuery.where(function() {
+      countQuery.where(function () {
         this.where('transactions.name', 'ilike', `%${search}%`)
-            .orWhere('transactions.merchant_name', 'ilike', `%${search}%`)
-            .orWhere('transactions.category_primary', 'ilike', `%${search}%`);
+          .orWhere('transactions.merchant_name', 'ilike', `%${search}%`)
+          .orWhere('transactions.category_primary', 'ilike', `%${search}%`);
       });
     }
 
@@ -113,8 +113,8 @@ router.get('/', auth, async (req, res) => {
         limit: parseInt(limit),
         total,
         pages: Math.ceil(total / limit),
-        hasMore: transactions.length === parseInt(limit)
-      }
+        hasMore: transactions.length === parseInt(limit),
+      },
     });
   } catch (error) {
     logger.error('Error fetching transactions:', error);
@@ -151,7 +151,7 @@ router.get('/:id', auth, async (req, res) => {
 router.put('/:id/category', auth, async (req, res) => {
   try {
     const { category } = req.body;
-    
+
     const transaction = await db('transactions')
       .join('accounts', 'transactions.account_id', 'accounts.id')
       .where('transactions.id', req.params.id)
@@ -163,9 +163,7 @@ router.put('/:id/category', auth, async (req, res) => {
       return res.status(404).json({ error: 'Transaction not found' });
     }
 
-    await db('transactions')
-      .where('id', req.params.id)
-      .update({ category });
+    await db('transactions').where('id', req.params.id).update({ category });
 
     res.json({ message: 'Transaction category updated successfully' });
   } catch (error) {
@@ -211,18 +209,22 @@ router.get('/categories', auth, async (req, res) => {
       .orderBy('total', 'desc');
 
     // Add percentage of total spending
-    const totalSpending = categorySpending.reduce((sum, cat) => sum + parseFloat(cat.total), 0);
+    const totalSpending = categorySpending.reduce(
+      (sum, cat) => sum + parseFloat(cat.total),
+      0
+    );
     const categoriesWithPercentage = categorySpending.map(cat => ({
       ...cat,
       total: parseFloat(cat.total),
       average: parseFloat(cat.average),
-      percentage: totalSpending > 0 ? (parseFloat(cat.total) / totalSpending * 100) : 0
+      percentage:
+        totalSpending > 0 ? (parseFloat(cat.total) / totalSpending) * 100 : 0,
     }));
 
     res.json({
       categories: categoriesWithPercentage,
       total_spending: totalSpending,
-      timeframe
+      timeframe,
     });
   } catch (error) {
     logger.error('Error fetching category spending:', error);
@@ -243,8 +245,16 @@ router.get('/trends', auth, async (req, res) => {
       .where('accounts.user_id', req.user.id)
       .where('transactions.date', '>=', monthsAgo)
       .select(db.raw("DATE_TRUNC('month', transactions.date) as month"))
-      .select(db.raw('SUM(CASE WHEN transactions.amount > 0 THEN transactions.amount ELSE 0 END) as income'))
-      .select(db.raw('SUM(CASE WHEN transactions.amount < 0 THEN ABS(transactions.amount) ELSE 0 END) as expenses'))
+      .select(
+        db.raw(
+          'SUM(CASE WHEN transactions.amount > 0 THEN transactions.amount ELSE 0 END) as income'
+        )
+      )
+      .select(
+        db.raw(
+          'SUM(CASE WHEN transactions.amount < 0 THEN ABS(transactions.amount) ELSE 0 END) as expenses'
+        )
+      )
       .select(db.raw('COUNT(*) as transaction_count'))
       .groupBy(db.raw("DATE_TRUNC('month', transactions.date)"))
       .orderBy('month', 'asc');
@@ -254,12 +264,12 @@ router.get('/trends', auth, async (req, res) => {
       income: parseFloat(month.income) || 0,
       expenses: parseFloat(month.expenses) || 0,
       net: (parseFloat(month.income) || 0) - (parseFloat(month.expenses) || 0),
-      transaction_count: parseInt(month.transaction_count)
+      transaction_count: parseInt(month.transaction_count),
     }));
 
     res.json({
       monthly_data: formattedData,
-      months: parseInt(months)
+      months: parseInt(months),
     });
   } catch (error) {
     logger.error('Error fetching spending trends:', error);
@@ -297,12 +307,22 @@ router.get('/insights', auth, async (req, res) => {
       .where('accounts.user_id', req.user.id)
       .where('transactions.date', '>=', dateFilter)
       .select(
-        db.raw('SUM(CASE WHEN transactions.amount > 0 THEN transactions.amount ELSE 0 END) as total_income'),
-        db.raw('SUM(CASE WHEN transactions.amount < 0 THEN ABS(transactions.amount) ELSE 0 END) as total_expenses'),
+        db.raw(
+          'SUM(CASE WHEN transactions.amount > 0 THEN transactions.amount ELSE 0 END) as total_income'
+        ),
+        db.raw(
+          'SUM(CASE WHEN transactions.amount < 0 THEN ABS(transactions.amount) ELSE 0 END) as total_expenses'
+        ),
         db.raw('COUNT(*) as total_transactions'),
-        db.raw('COUNT(DISTINCT transactions.category_primary) as unique_categories'),
-        db.raw('AVG(CASE WHEN transactions.amount < 0 THEN ABS(transactions.amount) END) as avg_expense'),
-        db.raw('MAX(CASE WHEN transactions.amount < 0 THEN ABS(transactions.amount) END) as largest_expense')
+        db.raw(
+          'COUNT(DISTINCT transactions.category_primary) as unique_categories'
+        ),
+        db.raw(
+          'AVG(CASE WHEN transactions.amount < 0 THEN ABS(transactions.amount) END) as avg_expense'
+        ),
+        db.raw(
+          'MAX(CASE WHEN transactions.amount < 0 THEN ABS(transactions.amount) END) as largest_expense'
+        )
       )
       .first();
 
@@ -323,7 +343,9 @@ router.get('/insights', auth, async (req, res) => {
     const formattedSummary = {
       total_income: parseFloat(summary.total_income) || 0,
       total_expenses: parseFloat(summary.total_expenses) || 0,
-      net_income: (parseFloat(summary.total_income) || 0) - (parseFloat(summary.total_expenses) || 0),
+      net_income:
+        (parseFloat(summary.total_income) || 0) -
+        (parseFloat(summary.total_expenses) || 0),
       total_transactions: parseInt(summary.total_transactions),
       unique_categories: parseInt(summary.unique_categories),
       avg_expense: parseFloat(summary.avg_expense) || 0,
@@ -331,13 +353,13 @@ router.get('/insights', auth, async (req, res) => {
       top_merchants: topMerchants.map(m => ({
         name: m.merchant_name,
         total: parseFloat(m.total),
-        transaction_count: parseInt(m.transaction_count)
-      }))
+        transaction_count: parseInt(m.transaction_count),
+      })),
     };
 
     res.json({
       insights: formattedSummary,
-      timeframe
+      timeframe,
     });
   } catch (error) {
     logger.error('Error fetching insights:', error);
@@ -348,18 +370,20 @@ router.get('/insights', auth, async (req, res) => {
 // Create manual transaction
 router.post('/', auth, async (req, res) => {
   try {
-    const { 
-      account_id, 
-      name, 
-      amount, 
-      date, 
+    const {
+      account_id,
+      name,
+      amount,
+      date,
       category_primary = 'Other',
       merchant_name = null,
-      description = null 
+      description = null,
     } = req.body;
 
     if (!account_id || !name || !amount || !date) {
-      return res.status(400).json({ error: 'Account ID, name, amount, and date are required' });
+      return res
+        .status(400)
+        .json({ error: 'Account ID, name, amount, and date are required' });
     }
 
     // Verify account belongs to user
@@ -372,20 +396,22 @@ router.post('/', auth, async (req, res) => {
       return res.status(404).json({ error: 'Account not found' });
     }
 
-    const [transactionId] = await db('transactions').insert({
-      user_id: req.user.id,
-      account_id,
-      plaid_transaction_id: `manual_${Date.now()}`,
-      name,
-      description,
-      amount: parseFloat(amount),
-      date: new Date(date),
-      category_primary,
-      merchant_name,
-      pending: false,
-      created_at: new Date(),
-      updated_at: new Date()
-    }).returning('id');
+    const [transactionId] = await db('transactions')
+      .insert({
+        user_id: req.user.id,
+        account_id,
+        plaid_transaction_id: `manual_${Date.now()}`,
+        name,
+        description,
+        amount: parseFloat(amount),
+        date: new Date(date),
+        category_primary,
+        merchant_name,
+        pending: false,
+        created_at: new Date(),
+        updated_at: new Date(),
+      })
+      .returning('id');
 
     const transaction = await db('transactions')
       .where('id', transactionId)
@@ -393,13 +419,11 @@ router.post('/', auth, async (req, res) => {
 
     // Update account balance
     const newBalance = parseFloat(account.current_balance) + parseFloat(amount);
-    await db('accounts')
-      .where('id', account_id)
-      .update({
-        current_balance: newBalance,
-        available_balance: newBalance,
-        updated_at: new Date()
-      });
+    await db('accounts').where('id', account_id).update({
+      current_balance: newBalance,
+      available_balance: newBalance,
+      updated_at: new Date(),
+    });
 
     logger.info(`Manual transaction created: ${name} for user ${req.user.id}`);
     res.status(201).json(transaction);
@@ -409,4 +433,4 @@ router.post('/', auth, async (req, res) => {
   }
 });
 
-module.exports = router; 
+module.exports = router;

@@ -10,7 +10,18 @@ const router = express.Router();
 router.get('/profile', auth, async (req, res) => {
   try {
     const user = await db('users')
-      .select('id', 'email', 'first_name', 'last_name', 'pseudonymous_username', 'phone', 'address', 'date_of_birth', 'email_verified', 'created_at')
+      .select(
+        'id',
+        'email',
+        'first_name',
+        'last_name',
+        'pseudonymous_username',
+        'phone',
+        'address',
+        'date_of_birth',
+        'email_verified',
+        'created_at'
+      )
       .where({ id: req.user.id })
       .first();
 
@@ -28,44 +39,53 @@ router.get('/profile', auth, async (req, res) => {
 // Update user profile
 router.put('/profile', auth, async (req, res) => {
   try {
-    const { 
-      firstName, 
-      lastName, 
-      pseudonymous_username, 
-      phone, 
-      address, 
-      dateOfBirth 
+    const {
+      firstName,
+      lastName,
+      pseudonymous_username,
+      phone,
+      address,
+      dateOfBirth,
     } = req.body;
-    
+
     const updateData = {
       first_name: firstName,
       last_name: lastName,
-      updated_at: new Date()
+      updated_at: new Date(),
     };
 
     // Only update fields if they're provided
     if (pseudonymous_username !== undefined) {
       updateData.pseudonymous_username = pseudonymous_username;
     }
-    
+
     if (phone !== undefined) {
       updateData.phone = phone;
     }
-    
+
     if (address !== undefined) {
       updateData.address = address;
     }
-    
+
     if (dateOfBirth !== undefined) {
       updateData.date_of_birth = dateOfBirth;
     }
-    
-    await db('users')
-      .where({ id: req.user.id })
-      .update(updateData);
+
+    await db('users').where({ id: req.user.id }).update(updateData);
 
     const updatedUser = await db('users')
-      .select('id', 'email', 'first_name', 'last_name', 'pseudonymous_username', 'phone', 'address', 'date_of_birth', 'email_verified', 'created_at')
+      .select(
+        'id',
+        'email',
+        'first_name',
+        'last_name',
+        'pseudonymous_username',
+        'phone',
+        'address',
+        'date_of_birth',
+        'email_verified',
+        'created_at'
+      )
       .where({ id: req.user.id })
       .first();
 
@@ -80,7 +100,7 @@ router.put('/profile', auth, async (req, res) => {
 router.put('/password', auth, async (req, res) => {
   try {
     const { currentPassword, newPassword } = req.body;
-    
+
     // Get user with password
     const user = await db('users')
       .select('id', 'password_hash')
@@ -92,21 +112,22 @@ router.put('/password', auth, async (req, res) => {
     }
 
     // Verify current password
-    const isValidPassword = await bcrypt.compare(currentPassword, user.password_hash);
+    const isValidPassword = await bcrypt.compare(
+      currentPassword,
+      user.password_hash
+    );
     if (!isValidPassword) {
       return res.status(400).json({ error: 'Current password is incorrect' });
     }
 
     // Hash new password
     const hashedPassword = await bcrypt.hash(newPassword, 12);
-    
+
     // Update password
-    await db('users')
-      .where({ id: req.user.id })
-      .update({
-        password_hash: hashedPassword,
-        updated_at: new Date()
-      });
+    await db('users').where({ id: req.user.id }).update({
+      password_hash: hashedPassword,
+      updated_at: new Date(),
+    });
 
     res.json({ message: 'Password updated successfully' });
   } catch (error) {
@@ -119,7 +140,7 @@ router.put('/password', auth, async (req, res) => {
 router.delete('/account', auth, async (req, res) => {
   try {
     const { password } = req.body;
-    
+
     // Get user with password
     const user = await db('users')
       .select('id', 'password')
@@ -146,4 +167,4 @@ router.delete('/account', auth, async (req, res) => {
   }
 });
 
-module.exports = router; 
+module.exports = router;

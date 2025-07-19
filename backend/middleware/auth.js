@@ -5,15 +5,17 @@ const db = require('../config/database');
 const auth = async (req, res, next) => {
   try {
     const token = req.header('Authorization')?.replace('Bearer ', '');
-    
+
     if (!token) {
       return res.status(401).json({ error: 'No token provided' });
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    
-    const user = await db('users').where({ id: decoded.id, is_active: true }).first();
-    
+
+    const user = await db('users')
+      .where({ id: decoded.id, is_active: true })
+      .first();
+
     if (!user) {
       return res.status(401).json({ error: 'Invalid token' });
     }
@@ -25,15 +27,15 @@ const auth = async (req, res, next) => {
   }
 };
 
-const generateToken = (userId) => {
+const generateToken = userId => {
   return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN || '7d'
+    expiresIn: process.env.JWT_EXPIRES_IN || '7d',
   });
 };
 
-const generateRefreshToken = (userId) => {
+const generateRefreshToken = userId => {
   return jwt.sign({ id: userId }, process.env.JWT_REFRESH_SECRET, {
-    expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '30d'
+    expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '30d',
   });
 };
 
@@ -47,7 +49,9 @@ const validateSignup = [
     .isLength({ min: 8 })
     .withMessage('Password must be at least 8 characters long')
     .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
-    .withMessage('Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'),
+    .withMessage(
+      'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'
+    ),
   body('firstName')
     .trim()
     .isLength({ min: 2, max: 50 })
@@ -63,9 +67,7 @@ const validateLogin = [
     .isEmail()
     .normalizeEmail({ gmail_remove_dots: false })
     .withMessage('Please provide a valid email'),
-  body('password')
-    .notEmpty()
-    .withMessage('Password is required'),
+  body('password').notEmpty().withMessage('Password is required'),
 ];
 
 const validatePasswordReset = [
@@ -80,10 +82,10 @@ const validatePasswordUpdate = [
     .isLength({ min: 8 })
     .withMessage('Password must be at least 8 characters long')
     .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
-    .withMessage('Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'),
-  body('token')
-    .notEmpty()
-    .withMessage('Reset token is required'),
+    .withMessage(
+      'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'
+    ),
+  body('token').notEmpty().withMessage('Reset token is required'),
 ];
 
 const checkValidation = (req, res, next) => {
@@ -102,5 +104,5 @@ module.exports = {
   validateLogin,
   validatePasswordReset,
   validatePasswordUpdate,
-  checkValidation
-}; 
+  checkValidation,
+};

@@ -1,6 +1,19 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Mail, Phone, MapPin, Clock, Send, MessageCircle, HelpCircle, Book, Zap, Shield, CreditCard } from 'lucide-react';
+import {
+  ArrowLeft,
+  Mail,
+  Phone,
+  MapPin,
+  Clock,
+  Send,
+  MessageCircle,
+  HelpCircle,
+  Book,
+  Zap,
+  Shield,
+  CreditCard,
+} from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import Logo from '../components/Logo';
 import SEO, { SEOConfigs } from '../components/SEO';
@@ -11,35 +24,37 @@ const SupportPage = () => {
     email: '',
     subject: '',
     message: '',
-    priority: 'normal'
+    priority: 'normal',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleInputChange = (e) => {
+  const handleInputChange = e => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
     setIsSubmitting(true);
 
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      toast.success('Message sent successfully! We\'ll get back to you within 24 hours.');
-      
+
+      toast.success(
+        "Message sent successfully! We'll get back to you within 24 hours."
+      );
+
       // Reset form
       setFormData({
         name: '',
         email: '',
         subject: '',
         message: '',
-        priority: 'normal'
+        priority: 'normal',
       });
     } catch (error) {
       toast.error('Failed to send message. Please try again.');
@@ -50,52 +65,57 @@ const SupportPage = () => {
 
   const faqItems = [
     {
-      question: "How do I connect my bank account?",
-      answer: "Go to Settings > Connected Accounts and click 'Add Account'. We use bank-level security to safely connect your accounts through our trusted partners."
+      question: 'How do I connect my bank account?',
+      answer:
+        "Go to Settings > Connected Accounts and click 'Add Account'. We use bank-level security to safely connect your accounts through our trusted partners.",
     },
     {
-      question: "Is my financial data secure?",
-      answer: "Yes! We use 256-bit encryption, multi-factor authentication, and follow strict security protocols. Your data is never shared with third parties without your consent."
+      question: 'Is my financial data secure?',
+      answer:
+        'Yes! We use 256-bit encryption, multi-factor authentication, and follow strict security protocols. Your data is never shared with third parties without your consent.',
     },
     {
-      question: "How does the AI analysis work?",
-      answer: "Our AI analyzes your spending patterns, categorizes transactions, and provides personalized insights to help you make better financial decisions."
+      question: 'How does the AI analysis work?',
+      answer:
+        'Our AI analyzes your spending patterns, categorizes transactions, and provides personalized insights to help you make better financial decisions.',
     },
     {
-      question: "Can I export my data?",
-      answer: "Absolutely! You can export your data in various formats (CSV, PDF) from your account settings at any time."
+      question: 'Can I export my data?',
+      answer:
+        'Absolutely! You can export your data in various formats (CSV, PDF) from your account settings at any time.',
     },
     {
-      question: "What types of accounts can I connect?",
-      answer: "We support most US banks, credit unions, credit cards, and investment accounts. If you have trouble connecting, contact us for assistance."
-    }
+      question: 'What types of accounts can I connect?',
+      answer:
+        'We support most US banks, credit unions, credit cards, and investment accounts. If you have trouble connecting, contact us for assistance.',
+    },
   ];
 
   const quickHelp = [
     {
       icon: Book,
-      title: "Getting Started",
-      description: "Learn the basics of finarro",
-      color: "from-blue-500 to-cyan-500"
+      title: 'Getting Started',
+      description: 'Learn the basics of finarro',
+      color: 'from-blue-500 to-cyan-500',
     },
     {
       icon: CreditCard,
-      title: "Account Connection",
-      description: "Connect your bank accounts",
-      color: "from-green-500 to-emerald-500"
+      title: 'Account Connection',
+      description: 'Connect your bank accounts',
+      color: 'from-green-500 to-emerald-500',
     },
     {
       icon: Shield,
-      title: "Security & Privacy",
-      description: "Understand our security measures",
-      color: "from-purple-500 to-pink-500"
+      title: 'Security & Privacy',
+      description: 'Understand our security measures',
+      color: 'from-purple-500 to-pink-500',
     },
     {
       icon: Zap,
-      title: "AI Features",
-      description: "Maximize your AI insights",
-      color: "from-orange-500 to-red-500"
-    }
+      title: 'AI Features',
+      description: 'Maximize your AI insights',
+      color: 'from-orange-500 to-red-500',
+    },
   ];
 
   return (
@@ -104,8 +124,8 @@ const SupportPage = () => {
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
-          <Link 
-            to="/" 
+          <Link
+            to="/"
             className="inline-flex items-center text-gray-400 hover:text-white transition-colors group"
           >
             <ArrowLeft className="h-4 w-4 mr-2 group-hover:transform group-hover:-translate-x-1 transition-transform" />
@@ -123,9 +143,12 @@ const SupportPage = () => {
                 <MessageCircle className="h-12 w-12 text-blue-400" />
               </div>
             </div>
-            <h1 className="text-4xl font-bold text-white mb-4">Support Center</h1>
+            <h1 className="text-4xl font-bold text-white mb-4">
+              Support Center
+            </h1>
             <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-              Get help with finarro, find answers to common questions, or reach out to our support team
+              Get help with finarro, find answers to common questions, or reach
+              out to our support team
             </p>
           </div>
 
@@ -137,11 +160,18 @@ const SupportPage = () => {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {quickHelp.map((item, index) => (
-                <div key={index} className="bg-gray-800/50 backdrop-blur border border-gray-700/50 rounded-xl p-6 hover:bg-gray-800/70 transition-all duration-300 hover:scale-105 cursor-pointer group">
-                  <div className={`p-3 bg-gradient-to-r ${item.color} bg-opacity-10 rounded-xl inline-block mb-4 group-hover:bg-opacity-20 transition-all`}>
+                <div
+                  key={index}
+                  className="bg-gray-800/50 backdrop-blur border border-gray-700/50 rounded-xl p-6 hover:bg-gray-800/70 transition-all duration-300 hover:scale-105 cursor-pointer group"
+                >
+                  <div
+                    className={`p-3 bg-gradient-to-r ${item.color} bg-opacity-10 rounded-xl inline-block mb-4 group-hover:bg-opacity-20 transition-all`}
+                  >
                     <item.icon className="h-6 w-6 text-white" />
                   </div>
-                  <h3 className="text-lg font-semibold text-white mb-2">{item.title}</h3>
+                  <h3 className="text-lg font-semibold text-white mb-2">
+                    {item.title}
+                  </h3>
                   <p className="text-gray-400 text-sm">{item.description}</p>
                 </div>
               ))}
@@ -155,11 +185,14 @@ const SupportPage = () => {
                 <Send className="h-6 w-6 mr-3 text-blue-400" />
                 Send us a Message
               </h2>
-              
+
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">
+                    <label
+                      htmlFor="name"
+                      className="block text-sm font-medium text-gray-300 mb-2"
+                    >
                       Your Name
                     </label>
                     <input
@@ -173,9 +206,12 @@ const SupportPage = () => {
                       placeholder="Enter your full name"
                     />
                   </div>
-                  
+
                   <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
+                    <label
+                      htmlFor="email"
+                      className="block text-sm font-medium text-gray-300 mb-2"
+                    >
                       Email Address
                     </label>
                     <input
@@ -193,7 +229,10 @@ const SupportPage = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label htmlFor="subject" className="block text-sm font-medium text-gray-300 mb-2">
+                    <label
+                      htmlFor="subject"
+                      className="block text-sm font-medium text-gray-300 mb-2"
+                    >
                       Subject
                     </label>
                     <input
@@ -207,9 +246,12 @@ const SupportPage = () => {
                       placeholder="Brief description of your issue"
                     />
                   </div>
-                  
+
                   <div>
-                    <label htmlFor="priority" className="block text-sm font-medium text-gray-300 mb-2">
+                    <label
+                      htmlFor="priority"
+                      className="block text-sm font-medium text-gray-300 mb-2"
+                    >
                       Priority
                     </label>
                     <select
@@ -222,13 +264,18 @@ const SupportPage = () => {
                       <option value="low">Low - General inquiry</option>
                       <option value="normal">Normal - Standard support</option>
                       <option value="high">High - Urgent issue</option>
-                      <option value="critical">Critical - Account access</option>
+                      <option value="critical">
+                        Critical - Account access
+                      </option>
                     </select>
                   </div>
                 </div>
 
                 <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-gray-300 mb-2">
+                  <label
+                    htmlFor="message"
+                    className="block text-sm font-medium text-gray-300 mb-2"
+                  >
                     Message
                   </label>
                   <textarea
@@ -269,7 +316,7 @@ const SupportPage = () => {
                 <Phone className="h-6 w-6 mr-3 text-blue-400" />
                 Contact Information
               </h2>
-              
+
               <div className="space-y-6">
                 <div className="bg-gray-800/50 backdrop-blur border border-gray-700/50 rounded-xl p-6">
                   <div className="flex items-center mb-4">
@@ -277,13 +324,19 @@ const SupportPage = () => {
                       <Mail className="h-6 w-6 text-green-400" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold text-white">Email Support</h3>
-                      <p className="text-gray-400 text-sm">Get help via email</p>
+                      <h3 className="text-lg font-semibold text-white">
+                        Email Support
+                      </h3>
+                      <p className="text-gray-400 text-sm">
+                        Get help via email
+                      </p>
                     </div>
                   </div>
                   <div className="space-y-2">
                     <p className="text-gray-300">📧 hello@finarro.com</p>
-                    <p className="text-gray-400 text-sm">Response time: Within 24 hours</p>
+                    <p className="text-gray-400 text-sm">
+                      Response time: Within 24 hours
+                    </p>
                   </div>
                 </div>
 
@@ -293,8 +346,12 @@ const SupportPage = () => {
                       <Phone className="h-6 w-6 text-blue-400" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold text-white">Phone Support</h3>
-                      <p className="text-gray-400 text-sm">Speak with our team</p>
+                      <h3 className="text-lg font-semibold text-white">
+                        Phone Support
+                      </h3>
+                      <p className="text-gray-400 text-sm">
+                        Speak with our team
+                      </p>
                     </div>
                   </div>
                   <div className="space-y-2">
@@ -312,8 +369,12 @@ const SupportPage = () => {
                       <MapPin className="h-6 w-6 text-purple-400" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold text-white">Office Address</h3>
-                      <p className="text-gray-400 text-sm">Visit us in person</p>
+                      <h3 className="text-lg font-semibold text-white">
+                        Office Address
+                      </h3>
+                      <p className="text-gray-400 text-sm">
+                        Visit us in person
+                      </p>
                     </div>
                   </div>
                   <div className="space-y-2">
@@ -332,11 +393,16 @@ const SupportPage = () => {
               <HelpCircle className="h-6 w-6 mr-3 text-blue-400" />
               Frequently Asked Questions
             </h2>
-            
+
             <div className="space-y-4">
               {faqItems.map((item, index) => (
-                <div key={index} className="bg-gray-800/50 backdrop-blur border border-gray-700/50 rounded-xl p-6 hover:bg-gray-800/70 transition-all duration-300">
-                  <h3 className="text-lg font-semibold text-white mb-3">{item.question}</h3>
+                <div
+                  key={index}
+                  className="bg-gray-800/50 backdrop-blur border border-gray-700/50 rounded-xl p-6 hover:bg-gray-800/70 transition-all duration-300"
+                >
+                  <h3 className="text-lg font-semibold text-white mb-3">
+                    {item.question}
+                  </h3>
                   <p className="text-gray-300 leading-relaxed">{item.answer}</p>
                 </div>
               ))}
@@ -345,19 +411,22 @@ const SupportPage = () => {
 
           {/* Additional Help */}
           <div className="mt-12 bg-blue-900/20 border border-blue-700/50 rounded-xl p-8 text-center">
-            <h3 className="text-2xl font-bold text-white mb-4">Still Need Help?</h3>
+            <h3 className="text-2xl font-bold text-white mb-4">
+              Still Need Help?
+            </h3>
             <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
-              Can't find what you're looking for? Our support team is here to help you get the most out of finarro.
+              Can't find what you're looking for? Our support team is here to
+              help you get the most out of finarro.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link 
-                to="/about" 
+              <Link
+                to="/about"
                 className="bg-gray-800/50 backdrop-blur border border-gray-700/50 hover:bg-gray-800/70 hover:border-gray-600/50 text-gray-300 hover:text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200"
               >
                 Learn More About finarro
               </Link>
-              <Link 
-                to="/docs" 
+              <Link
+                to="/docs"
                 className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-blue-500/25"
               >
                 View Documentation
@@ -370,4 +439,4 @@ const SupportPage = () => {
   );
 };
 
-export default SupportPage; 
+export default SupportPage;

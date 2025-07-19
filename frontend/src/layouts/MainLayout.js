@@ -1,18 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  MessageSquare, 
-  BarChart2, 
-  FileText, 
-  Settings, 
+import {
+  LayoutDashboard,
+  MessageSquare,
+  BarChart2,
+  FileText,
+  Settings,
   Menu,
   X,
   User,
   LogOut,
-  Bot,
   Bell,
-  Search
+  Search,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'react-hot-toast';
@@ -37,12 +36,11 @@ const MainLayout = ({ children }) => {
         const response = await subscriptionApi.getStatus();
         setSubscriptionData(response.data);
       } catch (error) {
-        console.error('Error loading subscription data:', error);
         // Set default free tier data on error
         setSubscriptionData({
           has_subscription: false,
           tier: 'free',
-          status: null
+          status: null,
         });
       }
     };
@@ -66,7 +64,7 @@ const MainLayout = ({ children }) => {
       const response = await subscriptionApi.getStatus();
       setSubscriptionData(response.data);
     } catch (error) {
-      console.error('Error loading subscription data:', error);
+      // Error loading subscription data
     }
   };
 
@@ -88,11 +86,10 @@ const MainLayout = ({ children }) => {
     }
   };
 
-  const handleSearch = (e) => {
+  const handleSearch = e => {
     e.preventDefault();
     if (searchQuery.trim()) {
       toast.success(`Searching for: ${searchQuery}`);
-      console.log('Search query:', searchQuery);
     } else {
       toast.error('Please enter a search term');
     }
@@ -100,7 +97,7 @@ const MainLayout = ({ children }) => {
 
   // Add keyboard shortcuts
   React.useEffect(() => {
-    const handleKeyDown = (e) => {
+    const handleKeyDown = e => {
       // Ctrl/Cmd + K to focus search
       if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
         e.preventDefault();
@@ -112,7 +109,7 @@ const MainLayout = ({ children }) => {
         setSearchQuery('');
       }
     };
-    
+
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
@@ -121,20 +118,22 @@ const MainLayout = ({ children }) => {
     <div className="h-screen flex bg-gray-900">
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 z-40 bg-black/50 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
-      <div className={`
+      <div
+        className={`
         fixed inset-y-0 left-0 z-50 w-64 bg-gray-950 border-r border-gray-800 transform transition-transform duration-200 ease-in-out lg:translate-x-0 lg:static lg:inset-0
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-      `}>
+      `}
+      >
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800">
           <Logo showText={true} />
-          <button 
+          <button
             onClick={() => setSidebarOpen(false)}
             className="lg:hidden text-gray-400 hover:text-white"
           >
@@ -144,7 +143,7 @@ const MainLayout = ({ children }) => {
 
         <nav className="mt-6 px-4">
           <ul className="space-y-2">
-            {navigation.map((item) => {
+            {navigation.map(item => {
               const isActive = location.pathname === item.href;
               return (
                 <li key={item.name}>
@@ -152,9 +151,10 @@ const MainLayout = ({ children }) => {
                     to={item.href}
                     className={`
                       flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors
-                      ${isActive 
-                        ? 'bg-indigo-600 text-white shadow-lg' 
-                        : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                      ${
+                        isActive
+                          ? 'bg-indigo-600 text-white shadow-lg'
+                          : 'text-gray-300 hover:bg-gray-800 hover:text-white'
                       }
                     `}
                     onClick={() => setSidebarOpen(false)}
@@ -173,8 +173,10 @@ const MainLayout = ({ children }) => {
           <div className="absolute bottom-4 left-4 right-4">
             <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg p-4 text-white">
               <h3 className="font-semibold text-sm mb-1">Upgrade to Pro</h3>
-              <p className="text-xs opacity-90 mb-3">Get unlimited AI insights and advanced features</p>
-              <button 
+              <p className="text-xs opacity-90 mb-3">
+                Get unlimited AI insights and advanced features
+              </p>
+              <button
                 onClick={() => setShowUpgradeModal(true)}
                 className="w-full bg-white text-indigo-600 text-sm font-medium py-2 px-4 rounded-md hover:bg-gray-100 transition-colors"
               >
@@ -197,7 +199,7 @@ const MainLayout = ({ children }) => {
               >
                 <Menu className="h-6 w-6" />
               </button>
-              
+
               <div className="hidden md:flex">
                 <form onSubmit={handleSearch} className="relative group">
                   <div className="relative">
@@ -205,7 +207,7 @@ const MainLayout = ({ children }) => {
                     <input
                       type="text"
                       value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onChange={e => setSearchQuery(e.target.value)}
                       placeholder="Search transactions & accounts"
                       className="bg-gray-800/50 backdrop-blur text-white placeholder-gray-400 pl-10 pr-12 py-2.5 rounded-xl border border-gray-600/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent focus:bg-gray-800 transition-all w-80 hover:bg-gray-800/70"
                     />
@@ -274,9 +276,9 @@ const MainLayout = ({ children }) => {
           {children}
         </main>
       </div>
-      
+
       {/* Subscription Upgrade Modal */}
-      <SubscriptionUpgrade 
+      <SubscriptionUpgrade
         isOpen={showUpgradeModal}
         onClose={() => setShowUpgradeModal(false)}
         onSuccess={handleUpgradeSuccess}
@@ -285,4 +287,4 @@ const MainLayout = ({ children }) => {
   );
 };
 
-export default MainLayout; 
+export default MainLayout;

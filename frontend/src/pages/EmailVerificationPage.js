@@ -23,7 +23,7 @@ const EmailVerificationPage = () => {
     const performVerification = async () => {
       try {
         const result = await verifyEmail(token);
-        
+
         if (result.success) {
           setVerificationStatus('success');
           toast.success('Email verified successfully!');
@@ -86,10 +86,11 @@ const EmailVerificationPage = () => {
               Email verified successfully!
             </h2>
             <p className="mt-2 text-sm text-gray-400">
-              Your email has been verified. You can now access all features of your account.
+              Your email has been verified. You can now access all features of
+              your account.
             </p>
           </div>
-          
+
           <div className="space-y-4">
             <p className="text-sm text-gray-400">
               Redirecting to dashboard in 3 seconds...
@@ -118,10 +119,11 @@ const EmailVerificationPage = () => {
             Verification failed
           </h2>
           <p className="mt-2 text-sm text-gray-400">
-            The verification link is invalid or has expired. Please request a new verification email.
+            The verification link is invalid or has expired. Please request a
+            new verification email.
           </p>
         </div>
-        
+
         <div className="space-y-4">
           <button
             onClick={handleResendVerification}
@@ -135,7 +137,7 @@ const EmailVerificationPage = () => {
             )}
             {isLoading ? 'Sending...' : 'Resend verification email'}
           </button>
-          
+
           <div className="text-center space-y-2">
             <Link
               to="/login"
@@ -156,4 +158,4 @@ const EmailVerificationPage = () => {
   );
 };
 
-export default EmailVerificationPage; 
+export default EmailVerificationPage;

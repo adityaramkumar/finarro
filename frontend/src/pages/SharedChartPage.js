@@ -1,15 +1,23 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { 
-  BarChart3, 
-  ArrowLeft, 
-  TrendingUp, 
-  Calendar, 
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
+import {
+  BarChart3,
+  ArrowLeft,
+  TrendingUp,
+  Calendar,
   Eye,
   ExternalLink,
   Lock,
-  AlertCircle
+  AlertCircle,
 } from 'lucide-react';
 import { sharesApi } from '../services/api';
 import Logo from '../components/Logo';
@@ -25,27 +33,31 @@ const SharedChartPage = () => {
   useEffect(() => {
     // Prevent double API calls in React StrictMode
     if (hasLoadedRef.current) return;
-    
+
     const loadSharedChart = async () => {
       try {
         setLoading(true);
         hasLoadedRef.current = true; // Mark as loaded to prevent duplicate calls
-        
+
         const response = await sharesApi.getSharedChart(token);
-        
+
         if (response.data.success) {
           setChartData(response.data);
           // Set default timeframe from settings
-          if (response.data.settings && response.data.settings.defaultTimeframe) {
+          if (
+            response.data.settings &&
+            response.data.settings.defaultTimeframe
+          ) {
             setSelectedTimeframe(response.data.settings.defaultTimeframe);
           }
         } else {
           setError('Chart not found');
         }
       } catch (err) {
-        console.error('Error loading shared chart:', err);
         if (err.response?.status === 404) {
-          setError('This shared chart was not found or is no longer available.');
+          setError(
+            'This shared chart was not found or is no longer available.'
+          );
         } else if (err.response?.status === 410) {
           setError('This shared chart has expired.');
         } else {
@@ -65,12 +77,12 @@ const SharedChartPage = () => {
   }, [token]);
 
   // Helper function for currency formatting
-  const formatCurrency = (amount) => {
+  const formatCurrency = amount => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
       minimumFractionDigits: 0,
-      maximumFractionDigits: 0
+      maximumFractionDigits: 0,
     }).format(amount);
   };
 
@@ -92,7 +104,9 @@ const SharedChartPage = () => {
           <div className="p-4 bg-red-900/20 rounded-full inline-block mb-6">
             <AlertCircle className="h-12 w-12 text-red-400" />
           </div>
-          <h1 className="text-2xl font-bold text-white mb-4">Chart Not Available</h1>
+          <h1 className="text-2xl font-bold text-white mb-4">
+            Chart Not Available
+          </h1>
           <p className="text-gray-400 mb-8">{error}</p>
           <Link
             to="/"
@@ -107,13 +121,15 @@ const SharedChartPage = () => {
   }
 
   // Get data for selected timeframe
-  const data = chartData && chartData.chartData && chartData.chartData[selectedTimeframe] 
-    ? chartData.chartData[selectedTimeframe] 
-    : [];
+  const data =
+    chartData && chartData.chartData && chartData.chartData[selectedTimeframe]
+      ? chartData.chartData[selectedTimeframe]
+      : [];
   const currentNetWorth = data.length > 0 ? data[data.length - 1].netWorth : 0;
   const firstNetWorth = data.length > 0 ? data[0].netWorth : 0;
   const totalGrowth = currentNetWorth - firstNetWorth;
-  const growthPercentage = firstNetWorth !== 0 ? ((totalGrowth / Math.abs(firstNetWorth)) * 100) : 0;
+  const growthPercentage =
+    firstNetWorth !== 0 ? (totalGrowth / Math.abs(firstNetWorth)) * 100 : 0;
 
   return (
     <div className="min-h-screen bg-gray-900">
@@ -153,7 +169,7 @@ const SharedChartPage = () => {
               const title = chartData.title || 'Net Worth Growth';
               // Extract name from title (e.g., "John Net Worth Growth" -> "John")
               const namePart = title.replace(' Net Worth Growth', '').trim();
-              
+
               if (namePart && namePart !== 'My') {
                 return (
                   <>
@@ -167,11 +183,11 @@ const SharedChartPage = () => {
               return 'Net Worth Growth';
             })()}
           </h1>
-          
+
           {/* Timeframe Selector */}
           <div className="flex items-center justify-center mb-8">
             <div className="bg-gray-800/50 backdrop-blur rounded-xl p-1 border border-gray-700/50">
-              {['7d', '30d', '90d', '1y'].map((timeframe) => (
+              {['7d', '30d', '90d', '1y'].map(timeframe => (
                 <button
                   key={timeframe}
                   onClick={() => setSelectedTimeframe(timeframe)}
@@ -181,15 +197,18 @@ const SharedChartPage = () => {
                       : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
                   }`}
                 >
-                  {timeframe === '7d' ? 'Last 7 days' : 
-                   timeframe === '30d' ? 'Last 30 days' :
-                   timeframe === '90d' ? 'Last 90 days' : 
-                   'Last year'}
+                  {timeframe === '7d'
+                    ? 'Last 7 days'
+                    : timeframe === '30d'
+                      ? 'Last 30 days'
+                      : timeframe === '90d'
+                        ? 'Last 90 days'
+                        : 'Last year'}
                 </button>
               ))}
             </div>
           </div>
-          
+
           <div className="flex items-center justify-center space-x-8 text-center">
             <div>
               <p className="text-gray-400 text-sm mb-1">Current Net Worth</p>
@@ -199,14 +218,20 @@ const SharedChartPage = () => {
             </div>
             <div>
               <p className="text-gray-400 text-sm mb-1">Period Growth</p>
-              <p className={`text-3xl font-bold ${totalGrowth >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                {totalGrowth >= 0 ? '+' : ''}{formatCurrency(totalGrowth)}
+              <p
+                className={`text-3xl font-bold ${totalGrowth >= 0 ? 'text-green-400' : 'text-red-400'}`}
+              >
+                {totalGrowth >= 0 ? '+' : ''}
+                {formatCurrency(totalGrowth)}
               </p>
             </div>
             <div>
               <p className="text-gray-400 text-sm mb-1">Growth Rate</p>
-              <p className={`text-3xl font-bold ${growthPercentage >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                {growthPercentage >= 0 ? '+' : ''}{growthPercentage.toFixed(1)}%
+              <p
+                className={`text-3xl font-bold ${growthPercentage >= 0 ? 'text-green-400' : 'text-red-400'}`}
+              >
+                {growthPercentage >= 0 ? '+' : ''}
+                {growthPercentage.toFixed(1)}%
               </p>
             </div>
           </div>
@@ -220,73 +245,113 @@ const SharedChartPage = () => {
                 <div className="p-4 bg-gray-800/30 rounded-full mb-4">
                   <BarChart3 className="h-12 w-12 text-gray-500" />
                 </div>
-                <h3 className="text-lg font-semibold text-white mb-2">No Data Available</h3>
-                <p className="text-gray-400">This chart doesn't contain data for the selected timeframe.</p>
+                <h3 className="text-lg font-semibold text-white mb-2">
+                  No Data Available
+                </h3>
+                <p className="text-gray-400">
+                  This chart doesn't contain data for the selected timeframe.
+                </p>
               </div>
             ) : (
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" strokeOpacity={0.2} />
-                  <XAxis 
-                    dataKey="name" 
-                    stroke="#9CA3AF" 
+                <LineChart
+                  data={data}
+                  margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                >
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    stroke="#374151"
+                    strokeOpacity={0.2}
+                  />
+                  <XAxis
+                    dataKey="name"
+                    stroke="#9CA3AF"
                     fontSize={12}
                     tickLine={false}
                     axisLine={false}
                   />
-                  <YAxis 
-                    stroke="#9CA3AF" 
+                  <YAxis
+                    stroke="#9CA3AF"
                     fontSize={12}
                     tickLine={false}
                     axisLine={false}
-                    tickFormatter={(value) => `$${(value/1000).toFixed(0)}k`}
+                    tickFormatter={value => `$${(value / 1000).toFixed(0)}k`}
                   />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: '#111827', 
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#111827',
                       border: '1px solid #374151',
                       borderRadius: '12px',
                       color: '#F3F4F6',
-                      boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+                      boxShadow:
+                        '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
                     }}
                     formatter={(value, name) => {
-                      if (name === 'netWorth') return [`${formatCurrency(value)}`, 'Net Worth'];
-                      if (name === 'assets') return [`${formatCurrency(value)}`, 'Assets'];
-                      if (name === 'liabilities') return [`${formatCurrency(value)}`, 'Liabilities'];
+                      if (name === 'netWorth')
+                        return [`${formatCurrency(value)}`, 'Net Worth'];
+                      if (name === 'assets')
+                        return [`${formatCurrency(value)}`, 'Assets'];
+                      if (name === 'liabilities')
+                        return [`${formatCurrency(value)}`, 'Liabilities'];
                       return [formatCurrency(value), name];
                     }}
                     labelStyle={{ color: '#9CA3AF' }}
                   />
-                  <Line 
-                    type="monotone" 
-                    dataKey="netWorth" 
-                    stroke="url(#netWorthGradient)" 
+                  <Line
+                    type="monotone"
+                    dataKey="netWorth"
+                    stroke="url(#netWorthGradient)"
                     strokeWidth={4}
                     dot={{ fill: '#10B981', strokeWidth: 3, r: 5 }}
-                    activeDot={{ r: 8, stroke: '#10B981', strokeWidth: 3, fill: '#ffffff' }}
+                    activeDot={{
+                      r: 8,
+                      stroke: '#10B981',
+                      strokeWidth: 3,
+                      fill: '#ffffff',
+                    }}
                   />
-                  <Line 
-                    type="monotone" 
-                    dataKey="assets" 
-                    stroke="#6366F1" 
+                  <Line
+                    type="monotone"
+                    dataKey="assets"
+                    stroke="#6366F1"
                     strokeWidth={2}
                     strokeDasharray="8 8"
                     dot={false}
-                    activeDot={{ r: 6, stroke: '#6366F1', strokeWidth: 2, fill: '#ffffff' }}
+                    activeDot={{
+                      r: 6,
+                      stroke: '#6366F1',
+                      strokeWidth: 2,
+                      fill: '#ffffff',
+                    }}
                   />
-                  <Line 
-                    type="monotone" 
-                    dataKey="liabilities" 
-                    stroke="#EF4444" 
+                  <Line
+                    type="monotone"
+                    dataKey="liabilities"
+                    stroke="#EF4444"
                     strokeWidth={2}
                     strokeDasharray="8 8"
                     dot={false}
-                    activeDot={{ r: 6, stroke: '#EF4444', strokeWidth: 2, fill: '#ffffff' }}
+                    activeDot={{
+                      r: 6,
+                      stroke: '#EF4444',
+                      strokeWidth: 2,
+                      fill: '#ffffff',
+                    }}
                   />
                   <defs>
-                    <linearGradient id="netWorthGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10B981" stopOpacity={0.8}/>
-                      <stop offset="95%" stopColor="#10B981" stopOpacity={0.3}/>
+                    <linearGradient
+                      id="netWorthGradient"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop offset="5%" stopColor="#10B981" stopOpacity={0.8} />
+                      <stop
+                        offset="95%"
+                        stopColor="#10B981"
+                        stopOpacity={0.3}
+                      />
                     </linearGradient>
                   </defs>
                 </LineChart>
@@ -318,10 +383,13 @@ const SharedChartPage = () => {
               <Lock className="h-8 w-8 text-indigo-400" />
             </div>
           </div>
-          <h3 className="text-xl font-bold text-white mb-3">Your Financial Privacy Matters</h3>
+          <h3 className="text-xl font-bold text-white mb-3">
+            Your Financial Privacy Matters
+          </h3>
           <p className="text-gray-400 mb-6 max-w-2xl mx-auto">
-            This chart shows only high-level net worth data. No personal information, bank details, 
-            or transaction data is shared. Ready to track your own financial growth?
+            This chart shows only high-level net worth data. No personal
+            information, bank details, or transaction data is shared. Ready to
+            track your own financial growth?
           </p>
           <Link
             to="/"
@@ -335,11 +403,19 @@ const SharedChartPage = () => {
         {/* Footer */}
         <div className="text-center mt-12 pt-8 border-t border-gray-800/50">
           <p className="text-gray-500 text-sm">
-                          Shared via <Link to="/" className="text-indigo-400 hover:text-indigo-300 transition-colors">finarro</Link>
+            Shared via{' '}
+            <Link
+              to="/"
+              className="text-indigo-400 hover:text-indigo-300 transition-colors"
+            >
+              finarro
+            </Link>
           </p>
           <div className="flex items-center justify-center space-x-1 mt-2">
             <Calendar className="h-3 w-3 text-gray-500" />
-            <span className="text-gray-500 text-sm">Created {new Date(chartData.createdAt).toLocaleDateString()}</span>
+            <span className="text-gray-500 text-sm">
+              Created {new Date(chartData.createdAt).toLocaleDateString()}
+            </span>
           </div>
         </div>
       </div>
@@ -347,4 +423,4 @@ const SharedChartPage = () => {
   );
 };
 
-export default SharedChartPage; 
+export default SharedChartPage;

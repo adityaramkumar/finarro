@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+coverage/
+dist/
+build/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Runtime data
+.DS_Store
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Database
+migrations/
+seeds/
+
+# Uploads
+uploads/
+
+# Package files
+package-lock.json
+yarn.lock 

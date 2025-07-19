@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
-import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import {
+  Elements,
+  CardElement,
+  useStripe,
+  useElements,
+} from '@stripe/react-stripe-js';
 import { CreditCard, Lock, CheckCircle, AlertCircle, X } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { subscriptionApi } from '../services/api';
 
-const stripePromise = process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY 
+const stripePromise = process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY
   ? loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY)
   : null;
 
@@ -23,7 +28,6 @@ const CheckoutForm = ({ onSuccess, onCancel }) => {
         const response = await subscriptionApi.createSetupIntent();
         setClientSecret(response.data.client_secret);
       } catch (error) {
-        console.error('Error creating setup intent:', error);
         setError('Failed to initialize payment. Please try again.');
       }
     };
@@ -31,7 +35,7 @@ const CheckoutForm = ({ onSuccess, onCancel }) => {
     createSetupIntent();
   }, []);
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async event => {
     event.preventDefault();
     setIsLoading(true);
     setError(null);
@@ -49,7 +53,7 @@ const CheckoutForm = ({ onSuccess, onCancel }) => {
         {
           payment_method: {
             card: cardElement,
-          }
+          },
         }
       );
 
@@ -80,7 +84,6 @@ const CheckoutForm = ({ onSuccess, onCancel }) => {
       toast.success('Successfully upgraded to Pro plan!');
       onSuccess();
     } catch (error) {
-      console.error('Error creating subscription:', error);
       setError(error.response?.data?.error || 'Failed to create subscription');
     } finally {
       setIsLoading(false);
@@ -158,14 +161,17 @@ const SubscriptionUpgrade = ({ isOpen, onClose, onSuccess }) => {
           >
             <X className="h-6 w-6" />
           </button>
-          
+
           <div className="text-center">
             <div className="p-3 bg-red-500/20 rounded-xl w-fit mx-auto mb-4">
               <AlertCircle className="h-8 w-8 text-red-400" />
             </div>
-            <h2 className="text-2xl font-bold text-white mb-2">Configuration Required</h2>
+            <h2 className="text-2xl font-bold text-white mb-2">
+              Configuration Required
+            </h2>
             <p className="text-gray-400 mb-6">
-              Stripe payment processing is not configured. Please set up your Stripe keys to enable subscriptions.
+              Stripe payment processing is not configured. Please set up your
+              Stripe keys to enable subscriptions.
             </p>
             <button
               onClick={onClose}
@@ -194,11 +200,15 @@ const SubscriptionUpgrade = ({ isOpen, onClose, onSuccess }) => {
             <CreditCard className="h-8 w-8 text-indigo-400" />
           </div>
           <h2 className="text-2xl font-bold text-white mb-2">Upgrade to Pro</h2>
-          <p className="text-gray-400">Unlock premium features and advanced AI insights</p>
+          <p className="text-gray-400">
+            Unlock premium features and advanced AI insights
+          </p>
         </div>
 
         <div className="bg-gray-800/40 backdrop-blur border border-gray-700/50 p-6 rounded-xl mb-6">
-          <h3 className="text-lg font-semibold text-white mb-4">Pro Plan Features</h3>
+          <h3 className="text-lg font-semibold text-white mb-4">
+            Pro Plan Features
+          </h3>
           <div className="space-y-3">
             <div className="flex items-center text-gray-300">
               <CheckCircle className="h-5 w-5 text-green-400 mr-3" />
@@ -263,4 +273,4 @@ const SubscriptionUpgrade = ({ isOpen, onClose, onSuccess }) => {
   );
 };
 
-export default SubscriptionUpgrade; 
+export default SubscriptionUpgrade;

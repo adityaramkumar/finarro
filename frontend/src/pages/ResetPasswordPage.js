@@ -24,9 +24,9 @@ const ResetPasswordPage = () => {
     }
   }, [token, navigate]);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
-    
+
     if (password !== confirmPassword) {
       toast.error('Passwords do not match');
       return;
@@ -41,7 +41,7 @@ const ResetPasswordPage = () => {
 
     try {
       const result = await resetPassword(token, password);
-      
+
       if (result.success) {
         setIsSuccess(true);
         toast.success('Password reset successful!');
@@ -68,10 +68,11 @@ const ResetPasswordPage = () => {
               Password reset successful!
             </h2>
             <p className="mt-2 text-sm text-gray-400">
-              Your password has been successfully reset. You can now log in with your new password.
+              Your password has been successfully reset. You can now log in with
+              your new password.
             </p>
           </div>
-          
+
           <div className="space-y-4">
             <p className="text-sm text-gray-400">
               Redirecting to login in 3 seconds...
@@ -103,7 +104,10 @@ const ResetPasswordPage = () => {
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-300 mb-2"
+              >
                 New Password
               </label>
               <div className="relative">
@@ -115,7 +119,7 @@ const ResetPasswordPage = () => {
                   type={showPassword ? 'text' : 'password'}
                   required
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={e => setPassword(e.target.value)}
                   className="appearance-none relative block w-full px-3 py-2 pl-10 pr-10 border border-gray-600 placeholder-gray-400 text-white rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm bg-gray-800"
                   placeholder="Enter new password"
                 />
@@ -134,7 +138,10 @@ const ResetPasswordPage = () => {
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-300 mb-2">
+              <label
+                htmlFor="confirmPassword"
+                className="block text-sm font-medium text-gray-300 mb-2"
+              >
                 Confirm New Password
               </label>
               <div className="relative">
@@ -146,7 +153,7 @@ const ResetPasswordPage = () => {
                   type={showConfirmPassword ? 'text' : 'password'}
                   required
                   value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  onChange={e => setConfirmPassword(e.target.value)}
                   className="appearance-none relative block w-full px-3 py-2 pl-10 pr-10 border border-gray-600 placeholder-gray-400 text-white rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm bg-gray-800"
                   placeholder="Confirm new password"
                 />
@@ -193,4 +200,4 @@ const ResetPasswordPage = () => {
   );
 };
 
-export default ResetPasswordPage; 
+export default ResetPasswordPage;

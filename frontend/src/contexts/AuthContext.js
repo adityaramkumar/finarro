@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useReducer,
+  useEffect,
+  useCallback,
+} from 'react';
 import { authApi } from '../services/api';
 
 // Auth context
@@ -10,30 +16,30 @@ const authReducer = (state, action) => {
     case 'SET_LOADING':
       return {
         ...state,
-        loading: action.payload
+        loading: action.payload,
       };
     case 'SET_USER':
       return {
         ...state,
         user: action.payload,
-        loading: false
+        loading: false,
       };
     case 'SET_TOKEN':
       return {
         ...state,
-        token: action.payload
+        token: action.payload,
       };
     case 'LOGOUT':
       return {
         user: null,
         token: null,
-        loading: false
+        loading: false,
       };
     case 'SET_ERROR':
       return {
         ...state,
         error: action.payload,
-        loading: false
+        loading: false,
       };
     default:
       return state;
@@ -45,12 +51,36 @@ const initialState = {
   user: null,
   token: localStorage.getItem('token'),
   loading: true,
-  error: null
+  error: null,
 };
 
 // Auth provider component
 export const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
+
+  // Logout function (defined first to avoid dependency issues)
+  const logout = useCallback(async () => {
+    try {
+      if (state.token) {
+        await authApi.logout();
+      }
+    } catch (error) {
+      // Error during logout
+    } finally {
+      localStorage.removeItem('token');
+      dispatch({ type: 'LOGOUT' });
+    }
+  }, [state.token]);
+
+  // Check authentication status
+  const checkAuthStatus = useCallback(async () => {
+    try {
+      const response = await authApi.me();
+      dispatch({ type: 'SET_USER', payload: response.data.user });
+    } catch (error) {
+      logout();
+    }
+  }, [logout]);
 
   // Check if user is authenticated on app load
   useEffect(() => {
@@ -61,30 +91,19 @@ export const AuthProvider = ({ children }) => {
     } else {
       dispatch({ type: 'SET_LOADING', payload: false });
     }
-  }, []);
-
-  // Check authentication status
-  const checkAuthStatus = async () => {
-    try {
-      const response = await authApi.me();
-      dispatch({ type: 'SET_USER', payload: response.data.user });
-    } catch (error) {
-      console.error('Auth check failed:', error);
-      logout();
-    }
-  };
+  }, [checkAuthStatus]);
 
   // Login function
-  const login = async (credentials) => {
+  const login = async credentials => {
     try {
       dispatch({ type: 'SET_LOADING', payload: true });
       const response = await authApi.login(credentials);
       const { user, token } = response.data;
-      
+
       localStorage.setItem('token', token);
       dispatch({ type: 'SET_TOKEN', payload: token });
       dispatch({ type: 'SET_USER', payload: user });
-      
+
       return { success: true };
     } catch (error) {
       const errorMessage = error.response?.data?.error || 'Login failed';
@@ -95,16 +114,16 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Signup function
-  const signup = async (userData) => {
+  const signup = async userData => {
     try {
       dispatch({ type: 'SET_LOADING', payload: true });
       const response = await authApi.signup(userData);
       const { user, token } = response.data;
-      
+
       localStorage.setItem('token', token);
       dispatch({ type: 'SET_TOKEN', payload: token });
       dispatch({ type: 'SET_USER', payload: user });
-      
+
       return { success: true };
     } catch (error) {
       const errorMessage = error.response?.data?.error || 'Signup failed';
@@ -113,27 +132,14 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Logout function
-  const logout = async () => {
-    try {
-      if (state.token) {
-        await authApi.logout();
-      }
-    } catch (error) {
-      console.error('Logout error:', error);
-    } finally {
-      localStorage.removeItem('token');
-      dispatch({ type: 'LOGOUT' });
-    }
-  };
-
   // Forgot password function
-  const forgotPassword = async (email) => {
+  const forgotPassword = async email => {
     try {
       await authApi.forgotPassword(email);
       return { success: true };
     } catch (error) {
-      const errorMessage = error.response?.data?.error || 'Failed to send reset email';
+      const errorMessage =
+        error.response?.data?.error || 'Failed to send reset email';
       return { success: false, error: errorMessage };
     }
   };
@@ -144,18 +150,20 @@ export const AuthProvider = ({ children }) => {
       await authApi.resetPassword(token, password);
       return { success: true };
     } catch (error) {
-      const errorMessage = error.response?.data?.error || 'Failed to reset password';
+      const errorMessage =
+        error.response?.data?.error || 'Failed to reset password';
       return { success: false, error: errorMessage };
     }
   };
 
   // Verify email function
-  const verifyEmail = async (token) => {
+  const verifyEmail = async token => {
     try {
       await authApi.verifyEmail(token);
       return { success: true };
     } catch (error) {
-      const errorMessage = error.response?.data?.error || 'Email verification failed';
+      const errorMessage =
+        error.response?.data?.error || 'Email verification failed';
       return { success: false, error: errorMessage };
     }
   };
@@ -172,14 +180,10 @@ export const AuthProvider = ({ children }) => {
     forgotPassword,
     resetPassword,
     verifyEmail,
-    checkAuthStatus
+    checkAuthStatus,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 // Custom hook to use auth context
@@ -191,4 +195,4 @@ export const useAuth = () => {
   return context;
 };
 
-export default AuthContext; 
+export default AuthContext;

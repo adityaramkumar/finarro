@@ -47,91 +47,106 @@ function App() {
       <AuthProvider>
         <Router>
           <ScrollToTop />
-        <div className="App">
-          <Routes>
-            {/* Public routes */}
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/signup" element={<SignupPage />} />
-            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-            <Route path="/reset-password" element={<ResetPasswordPage />} />
-            <Route path="/verify-email" element={<EmailVerificationPage />} />
-            <Route path="/privacy" element={<PrivacyPolicyPage />} />
-            <Route path="/terms" element={<TermsOfServicePage />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/support" element={<SupportPage />} />
-            
-            {/* Public shared chart route */}
-            <Route path="/share/:token" element={<SharedChartPage />} />
-            
-            {/* Protected routes with MainLayout */}
-            <Route path="/dashboard" element={
-              <PrivateRoute>
-                <MainLayout>
-                  <DashboardPage />
-                </MainLayout>
-              </PrivateRoute>
-            } />
-            <Route path="/chat" element={
-              <PrivateRoute>
-                <MainLayout>
-                  <ChatPage />
-                </MainLayout>
-              </PrivateRoute>
-            } />
-            <Route path="/reports" element={
-              <PrivateRoute>
-                <MainLayout>
-                  <ReportsPage />
-                </MainLayout>
-              </PrivateRoute>
-            } />
-            <Route path="/documents" element={
-              <PrivateRoute>
-                <MainLayout>
-                  <DocumentsPage />
-                </MainLayout>
-              </PrivateRoute>
-            } />
-            <Route path="/settings" element={
-              <PrivateRoute>
-                <MainLayout>
-                  <SettingsPage />
-                </MainLayout>
-              </PrivateRoute>
-            } />
-            
-            {/* 404 route */}
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
-          <Toaster
-            position="top-right"
-            toastOptions={{
-              duration: 4000,
-              style: {
-                background: '#374151',
-                color: '#f9fafb',
-                border: '1px solid #6b7280',
-              },
-              success: {
-                iconTheme: {
-                  primary: '#10b981',
-                  secondary: '#f9fafb',
+          <div className="App">
+            <Routes>
+              {/* Public routes */}
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/signup" element={<SignupPage />} />
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="/reset-password" element={<ResetPasswordPage />} />
+              <Route path="/verify-email" element={<EmailVerificationPage />} />
+              <Route path="/privacy" element={<PrivacyPolicyPage />} />
+              <Route path="/terms" element={<TermsOfServicePage />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/support" element={<SupportPage />} />
+
+              {/* Public shared chart route */}
+              <Route path="/share/:token" element={<SharedChartPage />} />
+
+              {/* Protected routes with MainLayout */}
+              <Route
+                path="/dashboard"
+                element={
+                  <PrivateRoute>
+                    <MainLayout>
+                      <DashboardPage />
+                    </MainLayout>
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/chat"
+                element={
+                  <PrivateRoute>
+                    <MainLayout>
+                      <ChatPage />
+                    </MainLayout>
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/reports"
+                element={
+                  <PrivateRoute>
+                    <MainLayout>
+                      <ReportsPage />
+                    </MainLayout>
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/documents"
+                element={
+                  <PrivateRoute>
+                    <MainLayout>
+                      <DocumentsPage />
+                    </MainLayout>
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/settings"
+                element={
+                  <PrivateRoute>
+                    <MainLayout>
+                      <SettingsPage />
+                    </MainLayout>
+                  </PrivateRoute>
+                }
+              />
+
+              {/* 404 route */}
+              <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+            <Toaster
+              position="top-right"
+              toastOptions={{
+                duration: 4000,
+                style: {
+                  background: '#374151',
+                  color: '#f9fafb',
+                  border: '1px solid #6b7280',
                 },
-              },
-              error: {
-                iconTheme: {
-                  primary: '#ef4444',
-                  secondary: '#f9fafb',
+                success: {
+                  iconTheme: {
+                    primary: '#10b981',
+                    secondary: '#f9fafb',
+                  },
                 },
-              },
-            }}
-          />
-        </div>
+                error: {
+                  iconTheme: {
+                    primary: '#ef4444',
+                    secondary: '#f9fafb',
+                  },
+                },
+              }}
+            />
+          </div>
         </Router>
       </AuthProvider>
     </QueryClientProvider>
   );
 }
 
-export default App; 
+export default App;

@@ -18,22 +18,31 @@ const storage = multer.diskStorage({
     cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
     cb(null, uniqueSuffix + path.extname(file.originalname));
-  }
+  },
 });
 
-const upload = multer({ 
+const upload = multer({
   storage,
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
   fileFilter: (req, file, cb) => {
-    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'text/csv'];
+    const allowedTypes = [
+      'application/pdf',
+      'image/jpeg',
+      'image/png',
+      'text/csv',
+    ];
     if (allowedTypes.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error('Invalid file type. Only PDF, JPEG, PNG, and CSV files are allowed.'));
+      cb(
+        new Error(
+          'Invalid file type. Only PDF, JPEG, PNG, and CSV files are allowed.'
+        )
+      );
     }
-  }
+  },
 });
 
 // Get all documents for user
@@ -62,8 +71,8 @@ router.post('/upload', auth, upload.single('document'), async (req, res) => {
       return res.status(400).json({ error: 'No file uploaded' });
     }
 
-    const { name, type } = req.body;
-    
+    const { type } = req.body;
+
     // Check for duplicate document (same filename, size, and user)
     const existingDocument = await db('documents')
       .where('user_id', req.user.id)
@@ -77,24 +86,26 @@ router.post('/upload', auth, upload.single('document'), async (req, res) => {
       if (fs.existsSync(req.file.path)) {
         fs.unlinkSync(req.file.path);
       }
-      return res.status(409).json({ 
-        error: 'Document already exists', 
+      return res.status(409).json({
+        error: 'Document already exists',
         message: `A document with the name "${req.file.originalname}" and same size already exists in your account.`,
-        existing_document: existingDocument
+        existing_document: existingDocument,
       });
     }
-    
-    const result = await db('documents').insert({
-      user_id: req.user.id,
-      filename: req.file.filename,
-      original_filename: req.file.originalname,
-      document_type: type || 'other',
-      file_path: req.file.path,
-      file_size: req.file.size.toString(),
-      mime_type: req.file.mimetype,
-      created_at: new Date(),
-      updated_at: new Date()
-    }).returning('id');
+
+    const result = await db('documents')
+      .insert({
+        user_id: req.user.id,
+        filename: req.file.filename,
+        original_filename: req.file.originalname,
+        document_type: type || 'other',
+        file_path: req.file.path,
+        file_size: req.file.size.toString(),
+        mime_type: req.file.mimetype,
+        created_at: new Date(),
+        updated_at: new Date(),
+      })
+      .returning('id');
 
     let documentId;
     if (Array.isArray(result)) {
@@ -102,10 +113,8 @@ router.post('/upload', auth, upload.single('document'), async (req, res) => {
     } else {
       documentId = result.id || result;
     }
-    
-    const document = await db('documents')
-      .where('id', documentId)
-      .first();
+
+    const document = await db('documents').where('id', documentId).first();
 
     res.status(201).json(document);
   } catch (error) {
@@ -188,7 +197,7 @@ router.delete('/:id', auth, async (req, res) => {
 router.put('/:id', auth, async (req, res) => {
   try {
     const { name, type } = req.body;
-    
+
     const document = await db('documents')
       .where('id', req.params.id)
       .where('user_id', req.user.id)
@@ -198,13 +207,11 @@ router.put('/:id', auth, async (req, res) => {
       return res.status(404).json({ error: 'Document not found' });
     }
 
-    await db('documents')
-      .where('id', req.params.id)
-      .update({
-        original_filename: name,
-        document_type: type,
-        updated_at: new Date()
-      });
+    await db('documents').where('id', req.params.id).update({
+      original_filename: name,
+      document_type: type,
+      updated_at: new Date(),
+    });
 
     const updatedDocument = await db('documents')
       .where('id', req.params.id)
@@ -236,13 +243,13 @@ router.post('/:id/analyze', auth, async (req, res) => {
       insights: [
         'Document uploaded successfully',
         'Ready for review and processing',
-        'Use AI chat for detailed analysis'
+        'Use AI chat for detailed analysis',
       ],
       keyMetrics: {
         fileSize: document.file_size,
         uploadDate: document.created_at,
-        documentType: document.document_type
-      }
+        documentType: document.document_type,
+      },
     };
 
     // Update document with analysis
@@ -252,7 +259,7 @@ router.post('/:id/analyze', auth, async (req, res) => {
         ai_analysis: JSON.stringify(analysis),
         is_processed: true,
         processed_at: new Date(),
-        updated_at: new Date()
+        updated_at: new Date(),
       });
 
     res.json(analysis);
@@ -262,4 +269,4 @@ router.post('/:id/analyze', auth, async (req, res) => {
   }
 });
 
-module.exports = router; 
+module.exports = router;

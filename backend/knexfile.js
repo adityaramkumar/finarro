@@ -8,14 +8,14 @@ module.exports = {
       port: process.env.DB_PORT || 5432,
       database: process.env.DB_NAME || 'financier_dev',
       user: process.env.DB_USER || 'postgres',
-      password: process.env.DB_PASSWORD || 'password'
+      password: process.env.DB_PASSWORD || 'password',
     },
     migrations: {
-      directory: './database/migrations'
+      directory: './database/migrations',
     },
     seeds: {
-      directory: './database/seeds'
-    }
+      directory: './database/seeds',
+    },
   },
 
   staging: {
@@ -26,35 +26,35 @@ module.exports = {
       database: process.env.DB_NAME,
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
-      ssl: { rejectUnauthorized: false }
+      ssl: { rejectUnauthorized: false },
     },
     pool: {
       min: 2,
-      max: 10
+      max: 10,
     },
     migrations: {
-      directory: './database/migrations'
+      directory: './database/migrations',
     },
     seeds: {
-      directory: './database/seeds'
-    }
+      directory: './database/seeds',
+    },
   },
 
   production: {
     client: 'postgresql',
     connection: {
       connectionString: process.env.DATABASE_URL,
-      ssl: { rejectUnauthorized: false }
+      ssl: { rejectUnauthorized: false },
     },
     pool: {
       min: 2,
-      max: 10
+      max: 10,
     },
     migrations: {
-      directory: './database/migrations'
+      directory: './database/migrations',
     },
     seeds: {
-      directory: './database/seeds'
-    }
-  }
-}; 
+      directory: './database/seeds',
+    },
+  },
+};

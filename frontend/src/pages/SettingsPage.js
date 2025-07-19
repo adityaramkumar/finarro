@@ -1,5 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { User, Lock, Bell, CreditCard, Shield, Trash2, Save, Link, Eye, EyeOff, Plus, CheckCircle, AlertCircle, Crown, Calendar } from 'lucide-react';
+import {
+  User,
+  Bell,
+  CreditCard,
+  Shield,
+  Trash2,
+  Save,
+  Link,
+  Eye,
+  EyeOff,
+  Plus,
+  CheckCircle,
+  Crown,
+  Calendar,
+} from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'react-hot-toast';
 import { subscriptionApi, userApi } from '../services/api';
@@ -41,10 +55,34 @@ const SettingsPage = () => {
   });
 
   const linkedAccounts = [
-    { id: 1, name: 'Chase Bank', type: 'Checking', last4: '1234', connected: true },
-    { id: 2, name: 'Wells Fargo', type: 'Savings', last4: '5678', connected: true },
-    { id: 3, name: 'American Express', type: 'Credit Card', last4: '9012', connected: true },
-    { id: 4, name: 'Fidelity', type: 'Investment', last4: '3456', connected: false },
+    {
+      id: 1,
+      name: 'Chase Bank',
+      type: 'Checking',
+      last4: '1234',
+      connected: true,
+    },
+    {
+      id: 2,
+      name: 'Wells Fargo',
+      type: 'Savings',
+      last4: '5678',
+      connected: true,
+    },
+    {
+      id: 3,
+      name: 'American Express',
+      type: 'Credit Card',
+      last4: '9012',
+      connected: true,
+    },
+    {
+      id: 4,
+      name: 'Fidelity',
+      type: 'Investment',
+      last4: '3456',
+      connected: false,
+    },
   ];
 
   // Load subscription data
@@ -54,12 +92,11 @@ const SettingsPage = () => {
         const response = await subscriptionApi.getStatus();
         setSubscriptionData(response.data);
       } catch (error) {
-        console.error('Error loading subscription data:', error);
         // Set default free tier data on error
         setSubscriptionData({
           has_subscription: false,
           tier: 'free',
-          status: null
+          status: null,
         });
       } finally {
         setLoadingSubscription(false);
@@ -79,7 +116,12 @@ const SettingsPage = () => {
 
   // Handle subscription cancellation
   const handleCancelSubscription = async () => {
-    if (!window.confirm('Are you sure you want to cancel your subscription? You will retain access until the end of your current billing period.')) {
+    // eslint-disable-next-line no-alert
+    if (
+      !window.confirm(
+        'Are you sure you want to cancel your subscription? You will retain access until the end of your current billing period.'
+      )
+    ) {
       return;
     }
 
@@ -89,9 +131,10 @@ const SettingsPage = () => {
       // Reload subscription data
       const response = await subscriptionApi.getStatus();
       setSubscriptionData(response.data);
-      toast.success('Subscription cancelled. You will retain access until the end of your current billing period.');
+      toast.success(
+        'Subscription cancelled. You will retain access until the end of your current billing period.'
+      );
     } catch (error) {
-      console.error('Error cancelling subscription:', error);
       toast.error('Failed to cancel subscription. Please try again.');
     } finally {
       setIsLoading(false);
@@ -108,7 +151,6 @@ const SettingsPage = () => {
       setSubscriptionData(response.data);
       toast.success('Subscription reactivated!');
     } catch (error) {
-      console.error('Error reactivating subscription:', error);
       toast.error('Failed to reactivate subscription. Please try again.');
     } finally {
       setIsLoading(false);
@@ -120,28 +162,26 @@ const SettingsPage = () => {
     try {
       const response = await subscriptionApi.getStatus();
       setSubscriptionData(response.data);
-    } catch (error) {
-      console.error('Error loading subscription data:', error);
-    }
+    } catch (error) {}
   };
 
   // Format date for display
-  const formatDate = (dateString) => {
+  const formatDate = dateString => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
     });
   };
 
   // Format phone number as user types
-  const formatPhoneNumber = (value) => {
+  const formatPhoneNumber = value => {
     // Remove all non-digits
     const phoneNumber = value.replace(/\D/g, '');
-    
+
     // Limit to 10 digits
     const limitedPhoneNumber = phoneNumber.slice(0, 10);
-    
+
     // Format as (XXX) XXX-XXXX
     if (limitedPhoneNumber.length === 0) return '';
     if (limitedPhoneNumber.length <= 3) {
@@ -154,15 +194,15 @@ const SettingsPage = () => {
   };
 
   // Handle phone number input
-  const handlePhoneChange = (e) => {
+  const handlePhoneChange = e => {
     const formattedPhone = formatPhoneNumber(e.target.value);
-    setProfileData({...profileData, phone: formattedPhone});
+    setProfileData({ ...profileData, phone: formattedPhone });
   };
 
-  const handleProfileUpdate = async (e) => {
+  const handleProfileUpdate = async e => {
     e.preventDefault();
     setIsLoading(true);
-    
+
     try {
       // Call API to update profile
       await userApi.updateProfile({
@@ -171,21 +211,20 @@ const SettingsPage = () => {
         pseudonymous_username: profileData.pseudonymous_username || null,
         phone: profileData.phone || null,
         address: profileData.address || null,
-        dateOfBirth: profileData.dateOfBirth || null
+        dateOfBirth: profileData.dateOfBirth || null,
       });
-      
+
       toast.success('Profile updated successfully');
     } catch (error) {
-      console.error('Error updating profile:', error);
       toast.error('Failed to update profile');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handlePasswordUpdate = async (e) => {
+  const handlePasswordUpdate = async e => {
     e.preventDefault();
-    
+
     // Validation
     if (!passwordData.currentPassword) {
       toast.error('Current password is required');
@@ -196,26 +235,28 @@ const SettingsPage = () => {
       toast.error('New password must be at least 6 characters long');
       return;
     }
-    
+
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       toast.error('New passwords do not match');
       return;
     }
 
     setIsLoading(true);
-    
+
     try {
       // Call real API to update password
       await userApi.updatePassword({
         currentPassword: passwordData.currentPassword,
-        newPassword: passwordData.newPassword
+        newPassword: passwordData.newPassword,
       });
-      
+
       toast.success('Password updated successfully');
-      setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      setPasswordData({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+      });
     } catch (error) {
-      console.error('Error updating password:', error);
-      
       // Handle specific error messages from backend
       if (error.response?.data?.error) {
         toast.error(error.response.data.error);
@@ -229,7 +270,7 @@ const SettingsPage = () => {
 
   const handleNotificationUpdate = async (key, value) => {
     setNotifications(prev => ({ ...prev, [key]: value }));
-    
+
     try {
       // API call to update notification preferences
       await new Promise(resolve => setTimeout(resolve, 500)); // Simulate API call
@@ -240,11 +281,36 @@ const SettingsPage = () => {
   };
 
   const tabs = [
-    { id: 'profile', label: 'Profile', icon: User, color: 'from-blue-500 to-cyan-500' },
-    { id: 'security', label: 'Security', icon: Shield, color: 'from-green-500 to-emerald-500' },
-    { id: 'accounts', label: 'Linked Accounts', icon: Link, color: 'from-purple-500 to-pink-500' },
-    { id: 'notifications', label: 'Notifications', icon: Bell, color: 'from-yellow-500 to-orange-500' },
-    { id: 'billing', label: 'Billing', icon: CreditCard, color: 'from-indigo-500 to-purple-500' },
+    {
+      id: 'profile',
+      label: 'Profile',
+      icon: User,
+      color: 'from-blue-500 to-cyan-500',
+    },
+    {
+      id: 'security',
+      label: 'Security',
+      icon: Shield,
+      color: 'from-green-500 to-emerald-500',
+    },
+    {
+      id: 'accounts',
+      label: 'Linked Accounts',
+      icon: Link,
+      color: 'from-purple-500 to-pink-500',
+    },
+    {
+      id: 'notifications',
+      label: 'Notifications',
+      icon: Bell,
+      color: 'from-yellow-500 to-orange-500',
+    },
+    {
+      id: 'billing',
+      label: 'Billing',
+      icon: CreditCard,
+      color: 'from-indigo-500 to-purple-500',
+    },
   ];
 
   return (
@@ -252,9 +318,13 @@ const SettingsPage = () => {
       {/* Modern Header */}
       <div>
         <h1 className="text-4xl font-bold text-white">
-          <span className="text-transparent bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text">Settings</span>
+          <span className="text-transparent bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text">
+            Settings
+          </span>
         </h1>
-        <p className="text-gray-400 mt-3 text-xl">Manage your account and preferences</p>
+        <p className="text-gray-400 mt-3 text-xl">
+          Manage your account and preferences
+        </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -262,7 +332,7 @@ const SettingsPage = () => {
         <div className="lg:col-span-1">
           <div className="bg-gray-950/30 backdrop-blur border border-gray-800/50 rounded-2xl p-6 shadow-lg">
             <nav className="space-y-2">
-              {tabs.map((tab) => (
+              {tabs.map(tab => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
@@ -299,7 +369,12 @@ const SettingsPage = () => {
                     <input
                       type="text"
                       value={profileData.firstName}
-                      onChange={(e) => setProfileData({...profileData, firstName: e.target.value})}
+                      onChange={e =>
+                        setProfileData({
+                          ...profileData,
+                          firstName: e.target.value,
+                        })
+                      }
                       className="w-full bg-gray-800/50 backdrop-blur border border-gray-700/50 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all hover:bg-gray-800/70"
                     />
                   </div>
@@ -310,7 +385,12 @@ const SettingsPage = () => {
                     <input
                       type="text"
                       value={profileData.lastName}
-                      onChange={(e) => setProfileData({...profileData, lastName: e.target.value})}
+                      onChange={e =>
+                        setProfileData({
+                          ...profileData,
+                          lastName: e.target.value,
+                        })
+                      }
                       className="w-full bg-gray-800/50 backdrop-blur border border-gray-700/50 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all hover:bg-gray-800/70"
                     />
                   </div>
@@ -323,13 +403,19 @@ const SettingsPage = () => {
                   <input
                     type="text"
                     value={profileData.pseudonymous_username}
-                    onChange={(e) => setProfileData({...profileData, pseudonymous_username: e.target.value})}
+                    onChange={e =>
+                      setProfileData({
+                        ...profileData,
+                        pseudonymous_username: e.target.value,
+                      })
+                    }
                     placeholder="e.g., InvestorX, WealthBuilder, etc."
                     className="w-full bg-gray-800/50 backdrop-blur border border-gray-700/50 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all hover:bg-gray-800/70"
                   />
                   <p className="text-gray-400 text-sm mt-2">
-                    This name will be shown on your shared net worth charts instead of your real name. 
-                    Leave blank to use your first name.
+                    This name will be shown on your shared net worth charts
+                    instead of your real name. Leave blank to use your first
+                    name.
                   </p>
                 </div>
 
@@ -344,7 +430,8 @@ const SettingsPage = () => {
                     className="w-full bg-gray-700/50 backdrop-blur border border-gray-600/50 rounded-xl px-4 py-3 text-gray-300 cursor-not-allowed"
                   />
                   <p className="text-gray-400 text-sm mt-2">
-                    Email cannot be changed. Contact support if you need to update your email.
+                    Email cannot be changed. Contact support if you need to
+                    update your email.
                   </p>
                 </div>
 
@@ -372,7 +459,12 @@ const SettingsPage = () => {
                   <input
                     type="text"
                     value={profileData.address}
-                    onChange={(e) => setProfileData({...profileData, address: e.target.value})}
+                    onChange={e =>
+                      setProfileData({
+                        ...profileData,
+                        address: e.target.value,
+                      })
+                    }
                     placeholder="123 Main St, City, State 12345"
                     className="w-full bg-gray-800/50 backdrop-blur border border-gray-700/50 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all hover:bg-gray-800/70"
                   />
@@ -385,7 +477,12 @@ const SettingsPage = () => {
                   <input
                     type="date"
                     value={profileData.dateOfBirth}
-                    onChange={(e) => setProfileData({...profileData, dateOfBirth: e.target.value})}
+                    onChange={e =>
+                      setProfileData({
+                        ...profileData,
+                        dateOfBirth: e.target.value,
+                      })
+                    }
                     className="w-full bg-gray-800/50 backdrop-blur border border-gray-700/50 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all hover:bg-gray-800/70"
                   />
                 </div>
@@ -410,10 +507,12 @@ const SettingsPage = () => {
                 </div>
                 Security Settings
               </h2>
-              
+
               <div className="space-y-8">
                 <div className="bg-gray-800/40 backdrop-blur border border-gray-700/50 rounded-2xl p-6">
-                  <h3 className="text-lg font-bold text-white mb-6">Change Password</h3>
+                  <h3 className="text-lg font-bold text-white mb-6">
+                    Change Password
+                  </h3>
                   <form onSubmit={handlePasswordUpdate} className="space-y-6">
                     <div>
                       <label className="block text-sm font-bold text-gray-300 mb-3">
@@ -423,15 +522,26 @@ const SettingsPage = () => {
                         <input
                           type={showCurrentPassword ? 'text' : 'password'}
                           value={passwordData.currentPassword}
-                          onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
+                          onChange={e =>
+                            setPasswordData({
+                              ...passwordData,
+                              currentPassword: e.target.value,
+                            })
+                          }
                           className="w-full bg-gray-800/50 backdrop-blur border border-gray-700/50 rounded-xl px-4 py-3 pr-12 text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all hover:bg-gray-800/70"
                         />
                         <button
                           type="button"
-                          onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                          onClick={() =>
+                            setShowCurrentPassword(!showCurrentPassword)
+                          }
                           className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
                         >
-                          {showCurrentPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                          {showCurrentPassword ? (
+                            <EyeOff className="h-5 w-5" />
+                          ) : (
+                            <Eye className="h-5 w-5" />
+                          )}
                         </button>
                       </div>
                     </div>
@@ -444,7 +554,12 @@ const SettingsPage = () => {
                         <input
                           type={showNewPassword ? 'text' : 'password'}
                           value={passwordData.newPassword}
-                          onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
+                          onChange={e =>
+                            setPasswordData({
+                              ...passwordData,
+                              newPassword: e.target.value,
+                            })
+                          }
                           className="w-full bg-gray-800/50 backdrop-blur border border-gray-700/50 rounded-xl px-4 py-3 pr-12 text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all hover:bg-gray-800/70"
                         />
                         <button
@@ -452,7 +567,11 @@ const SettingsPage = () => {
                           onClick={() => setShowNewPassword(!showNewPassword)}
                           className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
                         >
-                          {showNewPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                          {showNewPassword ? (
+                            <EyeOff className="h-5 w-5" />
+                          ) : (
+                            <Eye className="h-5 w-5" />
+                          )}
                         </button>
                       </div>
                     </div>
@@ -465,15 +584,26 @@ const SettingsPage = () => {
                         <input
                           type={showConfirmPassword ? 'text' : 'password'}
                           value={passwordData.confirmPassword}
-                          onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
+                          onChange={e =>
+                            setPasswordData({
+                              ...passwordData,
+                              confirmPassword: e.target.value,
+                            })
+                          }
                           className="w-full bg-gray-800/50 backdrop-blur border border-gray-700/50 rounded-xl px-4 py-3 pr-12 text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all hover:bg-gray-800/70"
                         />
                         <button
                           type="button"
-                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          onClick={() =>
+                            setShowConfirmPassword(!showConfirmPassword)
+                          }
                           className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
                         >
-                          {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                          {showConfirmPassword ? (
+                            <EyeOff className="h-5 w-5" />
+                          ) : (
+                            <Eye className="h-5 w-5" />
+                          )}
                         </button>
                       </div>
                     </div>
@@ -489,7 +619,9 @@ const SettingsPage = () => {
                 </div>
 
                 <div className="bg-gray-800/40 backdrop-blur border border-gray-700/50 rounded-2xl p-6">
-                  <h3 className="text-lg font-bold text-white mb-6">Two-Factor Authentication</h3>
+                  <h3 className="text-lg font-bold text-white mb-6">
+                    Two-Factor Authentication
+                  </h3>
                   <div className="bg-gray-800/50 backdrop-blur border border-gray-700/50 p-6 rounded-xl">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-4">
@@ -497,8 +629,12 @@ const SettingsPage = () => {
                           <Shield className="h-6 w-6 text-blue-400" />
                         </div>
                         <div>
-                          <p className="text-white font-bold">SMS Authentication</p>
-                          <p className="text-sm text-gray-400">Receive codes via SMS</p>
+                          <p className="text-white font-bold">
+                            SMS Authentication
+                          </p>
+                          <p className="text-sm text-gray-400">
+                            Receive codes via SMS
+                          </p>
                         </div>
                       </div>
                       <button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-2 rounded-xl text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-blue-500/25 hover:scale-105 active:scale-95">
@@ -520,23 +656,32 @@ const SettingsPage = () => {
                 Linked Accounts
               </h2>
               <div className="space-y-4">
-                {linkedAccounts.map((account) => (
-                  <div key={account.id} className="bg-gray-800/40 backdrop-blur border border-gray-700/50 p-6 rounded-2xl hover:bg-gray-800/60 transition-all duration-300 hover:shadow-lg group">
+                {linkedAccounts.map(account => (
+                  <div
+                    key={account.id}
+                    className="bg-gray-800/40 backdrop-blur border border-gray-700/50 p-6 rounded-2xl hover:bg-gray-800/60 transition-all duration-300 hover:shadow-lg group"
+                  >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-4">
                         <div className="p-3 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-xl group-hover:from-purple-500/30 group-hover:to-pink-500/30 transition-colors">
                           <CreditCard className="h-6 w-6 text-purple-400" />
                         </div>
                         <div>
-                          <p className="font-bold text-white text-lg">{account.name}</p>
-                          <p className="text-sm text-gray-400">{account.type} •••• {account.last4}</p>
+                          <p className="font-bold text-white text-lg">
+                            {account.name}
+                          </p>
+                          <p className="text-sm text-gray-400">
+                            {account.type} •••• {account.last4}
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-center space-x-4">
                         {account.connected ? (
                           <div className="flex items-center space-x-2 bg-green-500/10 border border-green-500/20 rounded-xl px-4 py-2">
                             <CheckCircle className="h-4 w-4 text-green-400" />
-                            <span className="text-green-400 text-sm font-medium">Connected</span>
+                            <span className="text-green-400 text-sm font-medium">
+                              Connected
+                            </span>
                           </div>
                         ) : (
                           <button className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-6 py-2 rounded-xl text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-indigo-500/25 hover:scale-105 active:scale-95">
@@ -570,25 +715,36 @@ const SettingsPage = () => {
               </h2>
               <div className="space-y-4">
                 {Object.entries(notifications).map(([key, value]) => (
-                  <div key={key} className="bg-gray-800/40 backdrop-blur border border-gray-700/50 p-6 rounded-2xl hover:bg-gray-800/60 transition-all duration-300 hover:shadow-lg">
+                  <div
+                    key={key}
+                    className="bg-gray-800/40 backdrop-blur border border-gray-700/50 p-6 rounded-2xl hover:bg-gray-800/60 transition-all duration-300 hover:shadow-lg"
+                  >
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
                         <p className="font-bold text-white text-lg mb-2">
-                          {key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')}
+                          {key.charAt(0).toUpperCase() +
+                            key.slice(1).replace(/([A-Z])/g, ' $1')}
                         </p>
                         <p className="text-sm text-gray-400 leading-relaxed">
-                          {key === 'emailDigest' && 'Weekly summary of your financial activity'}
-                          {key === 'transactionAlerts' && 'Real-time alerts for new transactions'}
-                          {key === 'monthlyReports' && 'Monthly financial health reports'}
-                          {key === 'securityAlerts' && 'Security and login notifications'}
-                          {key === 'marketingEmails' && 'Product updates and promotional content'}
+                          {key === 'emailDigest' &&
+                            'Weekly summary of your financial activity'}
+                          {key === 'transactionAlerts' &&
+                            'Real-time alerts for new transactions'}
+                          {key === 'monthlyReports' &&
+                            'Monthly financial health reports'}
+                          {key === 'securityAlerts' &&
+                            'Security and login notifications'}
+                          {key === 'marketingEmails' &&
+                            'Product updates and promotional content'}
                         </p>
                       </div>
                       <label className="relative inline-flex items-center cursor-pointer ml-6">
                         <input
                           type="checkbox"
                           checked={value}
-                          onChange={(e) => handleNotificationUpdate(key, e.target.checked)}
+                          onChange={e =>
+                            handleNotificationUpdate(key, e.target.checked)
+                          }
                           className="sr-only peer"
                         />
                         <div className="w-14 h-8 bg-gray-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-yellow-800 rounded-full peer peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-7 after:w-7 after:transition-all peer-checked:bg-gradient-to-r peer-checked:from-yellow-500 peer-checked:to-orange-500"></div>
@@ -608,7 +764,7 @@ const SettingsPage = () => {
                 </div>
                 Billing & Subscription
               </h2>
-              
+
               {loadingSubscription ? (
                 <div className="flex items-center justify-center py-12">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500"></div>
@@ -626,13 +782,18 @@ const SettingsPage = () => {
                           Current Plan
                         </h3>
                         <p className="text-gray-400 text-lg">
-                          {subscriptionData?.tier === 'pro' ? 'Pro Plan' : 'Free Plan'}
+                          {subscriptionData?.tier === 'pro'
+                            ? 'Pro Plan'
+                            : 'Free Plan'}
                         </p>
-                        {subscriptionData?.tier === 'pro' && subscriptionData?.stripe_subscription?.cancel_at_period_end && (
-                          <p className="text-yellow-400 text-sm mt-1">
-                            Cancels on {formatDate(subscriptionData.current_period_end)}
-                          </p>
-                        )}
+                        {subscriptionData?.tier === 'pro' &&
+                          subscriptionData?.stripe_subscription
+                            ?.cancel_at_period_end && (
+                            <p className="text-yellow-400 text-sm mt-1">
+                              Cancels on{' '}
+                              {formatDate(subscriptionData.current_period_end)}
+                            </p>
+                          )}
                       </div>
                       <div className="text-right">
                         <p className="text-3xl font-bold text-white">
@@ -641,7 +802,7 @@ const SettingsPage = () => {
                         <p className="text-sm text-gray-400">per month</p>
                       </div>
                     </div>
-                    
+
                     <div className="space-y-3 mb-6">
                       {subscriptionData?.tier === 'pro' ? (
                         <>
@@ -683,9 +844,9 @@ const SettingsPage = () => {
                         </>
                       )}
                     </div>
-                    
-                    {(!subscriptionData || subscriptionData?.tier === 'free') ? (
-                      <button 
+
+                    {!subscriptionData || subscriptionData?.tier === 'free' ? (
+                      <button
                         onClick={() => setShowUpgradeModal(true)}
                         className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white py-3 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-indigo-500/25 hover:scale-105 active:scale-95 font-medium"
                       >
@@ -693,21 +854,26 @@ const SettingsPage = () => {
                       </button>
                     ) : (
                       <div className="flex space-x-3">
-                        {subscriptionData?.stripe_subscription?.cancel_at_period_end ? (
-                          <button 
+                        {subscriptionData?.stripe_subscription
+                          ?.cancel_at_period_end ? (
+                          <button
                             onClick={handleReactivateSubscription}
                             disabled={isLoading}
                             className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white py-3 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-green-500/25 font-medium disabled:opacity-50"
                           >
-                            {isLoading ? 'Processing...' : 'Reactivate Subscription'}
+                            {isLoading
+                              ? 'Processing...'
+                              : 'Reactivate Subscription'}
                           </button>
                         ) : (
-                          <button 
+                          <button
                             onClick={handleCancelSubscription}
                             disabled={isLoading}
                             className="flex-1 bg-red-600 hover:bg-red-700 text-white py-3 px-6 rounded-xl transition-all duration-200 font-medium disabled:opacity-50"
                           >
-                            {isLoading ? 'Processing...' : 'Cancel Subscription'}
+                            {isLoading
+                              ? 'Processing...'
+                              : 'Cancel Subscription'}
                           </button>
                         )}
                       </div>
@@ -717,25 +883,29 @@ const SettingsPage = () => {
                   {/* Billing Information */}
                   {subscriptionData?.tier === 'pro' && (
                     <div className="bg-gray-800/40 backdrop-blur border border-gray-700/50 p-8 rounded-2xl hover:bg-gray-800/60 transition-all duration-300 hover:shadow-lg">
-                      <h3 className="text-xl font-bold text-white mb-6">Billing Information</h3>
+                      <h3 className="text-xl font-bold text-white mb-6">
+                        Billing Information
+                      </h3>
                       <div className="space-y-4">
                         <div className="flex items-center justify-between">
                           <span className="text-gray-300">Status</span>
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            subscriptionData?.status === 'active' 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-yellow-100 text-yellow-800'
-                          }`}>
+                          <span
+                            className={`px-2 py-1 rounded-full text-xs font-medium ${
+                              subscriptionData?.status === 'active'
+                                ? 'bg-green-100 text-green-800'
+                                : 'bg-yellow-100 text-yellow-800'
+                            }`}
+                          >
                             {subscriptionData?.status?.toUpperCase()}
                           </span>
                         </div>
                         {subscriptionData?.current_period_end && (
                           <div className="flex items-center justify-between">
                             <span className="text-gray-300">
-                              {subscriptionData?.stripe_subscription?.cancel_at_period_end 
-                                ? 'Access until' 
-                                : 'Next billing date'
-                              }
+                              {subscriptionData?.stripe_subscription
+                                ?.cancel_at_period_end
+                                ? 'Access until'
+                                : 'Next billing date'}
                             </span>
                             <span className="text-white flex items-center">
                               <Calendar className="h-4 w-4 mr-1" />
@@ -752,9 +922,9 @@ const SettingsPage = () => {
           )}
         </div>
       </div>
-      
+
       {/* Subscription Upgrade Modal */}
-      <SubscriptionUpgrade 
+      <SubscriptionUpgrade
         isOpen={showUpgradeModal}
         onClose={() => setShowUpgradeModal(false)}
         onSuccess={handleUpgradeSuccess}
@@ -763,4 +933,4 @@ const SettingsPage = () => {
   );
 };
 
-export default SettingsPage; 
+export default SettingsPage;

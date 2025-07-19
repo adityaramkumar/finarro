@@ -38,7 +38,10 @@ router.get('/', auth, async (req, res) => {
 
     // Calculate total balances by account type
     const accountSummary = {
-      total_balance: accounts.reduce((sum, acc) => sum + parseFloat(acc.current_balance || 0), 0),
+      total_balance: accounts.reduce(
+        (sum, acc) => sum + parseFloat(acc.current_balance || 0),
+        0
+      ),
       checking_balance: accounts
         .filter(acc => acc.account_type === 'checking')
         .reduce((sum, acc) => sum + parseFloat(acc.current_balance || 0), 0),
@@ -50,7 +53,7 @@ router.get('/', auth, async (req, res) => {
         .reduce((sum, acc) => sum + parseFloat(acc.current_balance || 0), 0),
       credit_balance: accounts
         .filter(acc => acc.account_type === 'credit')
-        .reduce((sum, acc) => sum + parseFloat(acc.current_balance || 0), 0)
+        .reduce((sum, acc) => sum + parseFloat(acc.current_balance || 0), 0),
     };
 
     // Get recent transactions summary
@@ -59,16 +62,21 @@ router.get('/', auth, async (req, res) => {
       .where('accounts.user_id', userId)
       .where('transactions.date', '>=', dateFilter)
       .select(
-        db.raw('SUM(CASE WHEN transactions.amount > 0 THEN transactions.amount ELSE 0 END) as total_income'),
-        db.raw('SUM(CASE WHEN transactions.amount < 0 THEN ABS(transactions.amount) ELSE 0 END) as total_expenses'),
+        db.raw(
+          'SUM(CASE WHEN transactions.amount > 0 THEN transactions.amount ELSE 0 END) as total_income'
+        ),
+        db.raw(
+          'SUM(CASE WHEN transactions.amount < 0 THEN ABS(transactions.amount) ELSE 0 END) as total_expenses'
+        ),
         db.raw('COUNT(*) as total_transactions')
       )
       .first();
 
     // Get previous period data for percentage calculations
     const previousPeriodStart = new Date(dateFilter);
-    const previousPeriodEnd = new Date(dateFilter);
-    const daysDiff = Math.floor((new Date() - dateFilter) / (1000 * 60 * 60 * 24));
+    const daysDiff = Math.floor(
+      (new Date() - dateFilter) / (1000 * 60 * 60 * 24)
+    );
     previousPeriodStart.setDate(previousPeriodStart.getDate() - daysDiff);
 
     const previousTransactionSummary = await db('transactions')
@@ -77,14 +85,20 @@ router.get('/', auth, async (req, res) => {
       .where('transactions.date', '>=', previousPeriodStart)
       .where('transactions.date', '<', dateFilter)
       .select(
-        db.raw('SUM(CASE WHEN transactions.amount > 0 THEN transactions.amount ELSE 0 END) as total_income'),
-        db.raw('SUM(CASE WHEN transactions.amount < 0 THEN ABS(transactions.amount) ELSE 0 END) as total_expenses')
+        db.raw(
+          'SUM(CASE WHEN transactions.amount > 0 THEN transactions.amount ELSE 0 END) as total_income'
+        ),
+        db.raw(
+          'SUM(CASE WHEN transactions.amount < 0 THEN ABS(transactions.amount) ELSE 0 END) as total_expenses'
+        )
       )
       .first();
 
     // Calculate percentage changes
     const calculatePercentageChange = (current, previous) => {
-      if (!previous || previous === 0) {return 0;}
+      if (!previous || previous === 0) {
+        return 0;
+      }
       return ((current - previous) / previous) * 100;
     };
 
@@ -99,8 +113,10 @@ router.get('/', auth, async (req, res) => {
     );
 
     // Calculate investment accounts first for later use
-    const investmentAccounts = accounts.filter(acc => acc.account_type === 'investment');
-    
+    const investmentAccounts = accounts.filter(
+      acc => acc.account_type === 'investment'
+    );
+
     // Calculate real investment change based on transaction data
     let investmentChange = 0;
     if (investmentAccounts.length > 0) {
@@ -110,14 +126,14 @@ router.get('/', auth, async (req, res) => {
         .where('date', '>=', dateFilter)
         .sum('amount as current_change')
         .first();
-      
+
       const previousInvestmentValue = await db('transactions')
         .whereIn('account_id', investmentAccountIds)
         .where('date', '>=', previousPeriodStart)
         .where('date', '<', dateFilter)
         .sum('amount as previous_change')
         .first();
-      
+
       investmentChange = calculatePercentageChange(
         parseFloat(currentInvestmentValue.current_change) || 0,
         parseFloat(previousInvestmentValue.previous_change) || 0
@@ -162,11 +178,18 @@ router.get('/', auth, async (req, res) => {
       .limit(6);
 
     // Add colors to spending categories
-    const colors = ['#4F46E5', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#6B7280'];
+    const colors = [
+      '#4F46E5',
+      '#10B981',
+      '#F59E0B',
+      '#EF4444',
+      '#8B5CF6',
+      '#6B7280',
+    ];
     const categoriesWithColors = spendingByCategory.map((category, index) => ({
       ...category,
       value: parseFloat(category.value),
-      color: colors[index % colors.length]
+      color: colors[index % colors.length],
     }));
 
     // Get monthly income vs expenses (last 6 months)
@@ -178,48 +201,66 @@ router.get('/', auth, async (req, res) => {
       .where('accounts.user_id', userId)
       .where('transactions.date', '>=', sixMonthsAgo)
       .select(db.raw("DATE_TRUNC('month', transactions.date) as month"))
-      .select(db.raw('SUM(CASE WHEN transactions.amount > 0 THEN transactions.amount ELSE 0 END) as income'))
-      .select(db.raw('SUM(CASE WHEN transactions.amount < 0 THEN ABS(transactions.amount) ELSE 0 END) as expense'))
+      .select(
+        db.raw(
+          'SUM(CASE WHEN transactions.amount > 0 THEN transactions.amount ELSE 0 END) as income'
+        )
+      )
+      .select(
+        db.raw(
+          'SUM(CASE WHEN transactions.amount < 0 THEN ABS(transactions.amount) ELSE 0 END) as expense'
+        )
+      )
       .groupBy(db.raw("DATE_TRUNC('month', transactions.date)"))
       .orderBy('month', 'asc');
 
     const formattedMonthlyData = monthlyData.map(month => ({
-      name: new Date(month.month).toLocaleDateString('en-US', { month: 'short' }),
+      name: new Date(month.month).toLocaleDateString('en-US', {
+        month: 'short',
+      }),
       income: parseFloat(month.income) || 0,
-      expense: parseFloat(month.expense) || 0
+      expense: parseFloat(month.expense) || 0,
     }));
 
     // Get net worth data - generate realistic progression over time
     const netWorthData = [];
-    
+
     if (accounts.length > 0) {
       // Calculate current total assets and liabilities
       const totalAssets = accounts
-        .filter(acc => ['checking', 'savings', 'investment'].includes(acc.account_type))
+        .filter(acc =>
+          ['checking', 'savings', 'investment'].includes(acc.account_type)
+        )
         .reduce((sum, acc) => sum + parseFloat(acc.current_balance || 0), 0);
-      
-      const totalLiabilities = Math.abs(accounts
-        .filter(acc => acc.account_type === 'credit')
-        .reduce((sum, acc) => sum + parseFloat(acc.current_balance || 0), 0));
-      
+
+      const totalLiabilities = Math.abs(
+        accounts
+          .filter(acc => acc.account_type === 'credit')
+          .reduce((sum, acc) => sum + parseFloat(acc.current_balance || 0), 0)
+      );
+
       const currentNetWorth = totalAssets - totalLiabilities;
-      
+
       // Generate 6 months of historical data with realistic growth
       for (let i = 5; i >= 0; i--) {
         const monthDate = new Date();
         monthDate.setMonth(monthDate.getMonth() - i);
-        
+
         // Simulate gradual net worth growth over time (2-5% monthly growth with some variation)
         const growthFactor = 1 + (Math.random() * 0.03 + 0.02) * i; // 2-5% cumulative growth
-        const historicalNetWorth = Math.max(currentNetWorth / growthFactor, 1000);
+        const historicalNetWorth = Math.max(
+          currentNetWorth / growthFactor,
+          1000
+        );
         const historicalAssets = Math.max(totalAssets / growthFactor, 1000);
-        const historicalLiabilities = totalLiabilities / Math.max(growthFactor * 0.8, 1); // Liabilities grow slower
-        
+        const historicalLiabilities =
+          totalLiabilities / Math.max(growthFactor * 0.8, 1); // Liabilities grow slower
+
         netWorthData.push({
           name: monthDate.toLocaleDateString('en-US', { month: 'short' }),
           netWorth: Math.round(historicalNetWorth),
           assets: Math.round(historicalAssets),
-          liabilities: Math.round(historicalLiabilities)
+          liabilities: Math.round(historicalLiabilities),
         });
       }
     } else {
@@ -228,25 +269,31 @@ router.get('/', auth, async (req, res) => {
       for (let i = 5; i >= 0; i--) {
         const monthDate = new Date();
         monthDate.setMonth(monthDate.getMonth() - i);
-        
-        const growthFactor = 1 + (0.03 * (5 - i)); // 3% monthly growth
+
+        const growthFactor = 1 + 0.03 * (5 - i); // 3% monthly growth
         const netWorth = Math.round(baseNetWorth * growthFactor);
         const assets = Math.round(netWorth * 1.2); // 20% more assets than net worth
         const liabilities = assets - netWorth;
-        
+
         netWorthData.push({
           name: monthDate.toLocaleDateString('en-US', { month: 'short' }),
           netWorth: netWorth,
           assets: assets,
-          liabilities: liabilities
+          liabilities: liabilities,
         });
       }
     }
 
     // Calculate investment returns (simplified - in production you'd have actual investment data)
-    const investmentReturns = investmentAccounts.length > 0 
-      ? investmentAccounts.reduce((sum, acc) => sum + parseFloat(acc.current_balance || 0), 0) * 0.08 / 12 // 8% annual return
-      : 0;
+    const investmentReturns =
+      investmentAccounts.length > 0
+        ? (investmentAccounts.reduce(
+            (sum, acc) => sum + parseFloat(acc.current_balance || 0),
+            0
+          ) *
+            0.08) /
+          12 // 8% annual return
+        : 0;
 
     // Format final response
     const dashboardData = {
@@ -258,28 +305,32 @@ router.get('/', auth, async (req, res) => {
         monthly_income_change: incomeChange,
         monthly_expenses: parseFloat(transactionSummary.total_expenses) || 0,
         monthly_expenses_change: expenseChange,
-        net_growth: (parseFloat(transactionSummary.total_income) || 0) - (parseFloat(transactionSummary.total_expenses) || 0),
+        net_growth:
+          (parseFloat(transactionSummary.total_income) || 0) -
+          (parseFloat(transactionSummary.total_expenses) || 0),
         investment_returns: investmentReturns,
-        investment_returns_change: investmentChange
+        investment_returns_change: investmentChange,
       },
-      
-      // Account breakdown  
-      accounts: await Promise.all(accounts.map(async (acc) => {
-        // Calculate real balance change for this account in the timeframe
-        const accountChange = await db('transactions')
-          .where('account_id', acc.id)
-          .where('date', '>=', dateFilter)
-          .sum('amount as change')
-          .first();
-        
-        return {
-          id: acc.id,
-          name: acc.account_name,
-          type: acc.account_type,
-          balance: parseFloat(acc.current_balance || 0),
-          change: parseFloat(accountChange.change) || 0
-        };
-      })),
+
+      // Account breakdown
+      accounts: await Promise.all(
+        accounts.map(async acc => {
+          // Calculate real balance change for this account in the timeframe
+          const accountChange = await db('transactions')
+            .where('account_id', acc.id)
+            .where('date', '>=', dateFilter)
+            .sum('amount as change')
+            .first();
+
+          return {
+            id: acc.id,
+            name: acc.account_name,
+            type: acc.account_type,
+            balance: parseFloat(acc.current_balance || 0),
+            change: parseFloat(accountChange.change) || 0,
+          };
+        })
+      ),
 
       // Recent transactions
       transactions: recentTransactions.map(tx => ({
@@ -290,7 +341,7 @@ router.get('/', auth, async (req, res) => {
         date: tx.date,
         type: parseFloat(tx.amount) >= 0 ? 'income' : 'expense',
         merchant: tx.merchant_name,
-        account: tx.account_name
+        account: tx.account_name,
       })),
 
       // Spending breakdown
@@ -302,7 +353,7 @@ router.get('/', auth, async (req, res) => {
 
       // Metadata
       timeframe,
-      last_updated: new Date().toISOString()
+      last_updated: new Date().toISOString(),
     };
 
     res.json(dashboardData);
@@ -346,10 +397,13 @@ router.get('/insights', auth, async (req, res) => {
 
     const insights = {
       avg_transaction: parseFloat(spendingInsights.avg_transaction) || 0,
-      largest_transaction: parseFloat(spendingInsights.largest_transaction) || 0,
+      largest_transaction:
+        parseFloat(spendingInsights.largest_transaction) || 0,
       transaction_count: parseInt(spendingInsights.transaction_count) || 0,
-      top_spending_category: topCategory ? topCategory.category_primary : 'Other',
-      top_category_amount: topCategory ? parseFloat(topCategory.total) : 0
+      top_spending_category: topCategory
+        ? topCategory.category_primary
+        : 'Other',
+      top_category_amount: topCategory ? parseFloat(topCategory.total) : 0,
     };
 
     res.json({ insights });
@@ -359,4 +413,4 @@ router.get('/insights', auth, async (req, res) => {
   }
 });
 
-module.exports = router; 
+module.exports = router;

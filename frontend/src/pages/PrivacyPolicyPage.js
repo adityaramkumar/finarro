@@ -1,6 +1,15 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Shield, Eye, Lock, Database, UserCheck, Globe, Mail } from 'lucide-react';
+import {
+  ArrowLeft,
+  Shield,
+  Eye,
+  Lock,
+  Database,
+  UserCheck,
+  Globe,
+  Mail,
+} from 'lucide-react';
 import Logo from '../components/Logo';
 
 const PrivacyPolicyPage = () => {
@@ -9,8 +18,8 @@ const PrivacyPolicyPage = () => {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
-          <Link 
-            to="/" 
+          <Link
+            to="/"
             className="inline-flex items-center text-gray-400 hover:text-white transition-colors group"
           >
             <ArrowLeft className="h-4 w-4 mr-2 group-hover:transform group-hover:-translate-x-1 transition-transform" />
@@ -28,16 +37,22 @@ const PrivacyPolicyPage = () => {
                 <Shield className="h-12 w-12 text-indigo-400" />
               </div>
             </div>
-            <h1 className="text-4xl font-bold text-white mb-4">Privacy Policy</h1>
+            <h1 className="text-4xl font-bold text-white mb-4">
+              Privacy Policy
+            </h1>
             <p className="text-gray-400 text-lg">
-              Last updated: {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+              Last updated:{' '}
+              {new Date().toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              })}
             </p>
           </div>
 
           {/* Content */}
           <div className="prose prose-invert max-w-none">
             <div className="space-y-8">
-              
               {/* Introduction */}
               <section>
                 <h2 className="text-2xl font-bold text-white mb-4 flex items-center">
@@ -45,9 +60,10 @@ const PrivacyPolicyPage = () => {
                   Introduction
                 </h2>
                 <p className="text-gray-300 leading-relaxed">
-                  At finarro, we take your privacy seriously. This Privacy Policy explains how we collect, use, 
-                  disclose, and safeguard your information when you use our financial management platform. 
-                  Please read this privacy policy carefully.
+                  At finarro, we take your privacy seriously. This Privacy
+                  Policy explains how we collect, use, disclose, and safeguard
+                  your information when you use our financial management
+                  platform. Please read this privacy policy carefully.
                 </p>
               </section>
 
@@ -59,11 +75,15 @@ const PrivacyPolicyPage = () => {
                 </h2>
                 <div className="space-y-4">
                   <div className="bg-gray-800/50 backdrop-blur border border-gray-700/50 rounded-xl p-6">
-                    <h3 className="text-lg font-semibold text-white mb-3">Personal Information</h3>
+                    <h3 className="text-lg font-semibold text-white mb-3">
+                      Personal Information
+                    </h3>
                     <ul className="text-gray-300 space-y-3">
                       <li className="flex items-start">
                         <div className="w-2 h-2 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                        <span>Name, email address, and contact information</span>
+                        <span>
+                          Name, email address, and contact information
+                        </span>
                       </li>
                       <li className="flex items-start">
                         <div className="w-2 h-2 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full mt-2 mr-3 flex-shrink-0"></div>
@@ -71,7 +91,10 @@ const PrivacyPolicyPage = () => {
                       </li>
                       <li className="flex items-start">
                         <div className="w-2 h-2 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                        <span>Financial account information (bank accounts, credit cards)</span>
+                        <span>
+                          Financial account information (bank accounts, credit
+                          cards)
+                        </span>
                       </li>
                       <li className="flex items-start">
                         <div className="w-2 h-2 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full mt-2 mr-3 flex-shrink-0"></div>
@@ -84,7 +107,9 @@ const PrivacyPolicyPage = () => {
                     </ul>
                   </div>
                   <div className="bg-gray-800/50 backdrop-blur border border-gray-700/50 rounded-xl p-6">
-                    <h3 className="text-lg font-semibold text-white mb-3">Technical Information</h3>
+                    <h3 className="text-lg font-semibold text-white mb-3">
+                      Technical Information
+                    </h3>
                     <ul className="text-gray-300 space-y-3">
                       <li className="flex items-start">
                         <div className="w-2 h-2 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full mt-2 mr-3 flex-shrink-0"></div>
@@ -117,27 +142,45 @@ const PrivacyPolicyPage = () => {
                   <ul className="text-gray-300 space-y-3">
                     <li className="flex items-start">
                       <div className="w-2 h-2 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                      <span><strong>Financial Management:</strong> Analyze your spending patterns and provide insights</span>
+                      <span>
+                        <strong>Financial Management:</strong> Analyze your
+                        spending patterns and provide insights
+                      </span>
                     </li>
                     <li className="flex items-start">
                       <div className="w-2 h-2 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                      <span><strong>AI Analysis:</strong> Process documents and transactions for personalized recommendations</span>
+                      <span>
+                        <strong>AI Analysis:</strong> Process documents and
+                        transactions for personalized recommendations
+                      </span>
                     </li>
                     <li className="flex items-start">
                       <div className="w-2 h-2 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                      <span><strong>Account Management:</strong> Maintain your account and provide customer support</span>
+                      <span>
+                        <strong>Account Management:</strong> Maintain your
+                        account and provide customer support
+                      </span>
                     </li>
                     <li className="flex items-start">
                       <div className="w-2 h-2 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                      <span><strong>Security:</strong> Protect against fraud and unauthorized access</span>
+                      <span>
+                        <strong>Security:</strong> Protect against fraud and
+                        unauthorized access
+                      </span>
                     </li>
                     <li className="flex items-start">
                       <div className="w-2 h-2 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                      <span><strong>Communication:</strong> Send important updates and notifications</span>
+                      <span>
+                        <strong>Communication:</strong> Send important updates
+                        and notifications
+                      </span>
                     </li>
                     <li className="flex items-start">
                       <div className="w-2 h-2 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                      <span><strong>Improvement:</strong> Enhance our services and user experience</span>
+                      <span>
+                        <strong>Improvement:</strong> Enhance our services and
+                        user experience
+                      </span>
                     </li>
                   </ul>
                 </div>
@@ -151,12 +194,15 @@ const PrivacyPolicyPage = () => {
                 </h2>
                 <div className="bg-gray-800/50 backdrop-blur border border-gray-700/50 rounded-xl p-6">
                   <p className="text-gray-300 mb-4">
-                    We implement industry-standard security measures to protect your personal information:
+                    We implement industry-standard security measures to protect
+                    your personal information:
                   </p>
                   <ul className="text-gray-300 space-y-3">
                     <li className="flex items-start">
                       <div className="w-2 h-2 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                      <span>End-to-end encryption for all data transmission</span>
+                      <span>
+                        End-to-end encryption for all data transmission
+                      </span>
                     </li>
                     <li className="flex items-start">
                       <div className="w-2 h-2 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full mt-2 mr-3 flex-shrink-0"></div>
@@ -168,11 +214,15 @@ const PrivacyPolicyPage = () => {
                     </li>
                     <li className="flex items-start">
                       <div className="w-2 h-2 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                      <span>Regular security audits and penetration testing</span>
+                      <span>
+                        Regular security audits and penetration testing
+                      </span>
                     </li>
                     <li className="flex items-start">
                       <div className="w-2 h-2 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                      <span>Staff training on data protection best practices</span>
+                      <span>
+                        Staff training on data protection best practices
+                      </span>
                     </li>
                   </ul>
                 </div>
@@ -186,8 +236,9 @@ const PrivacyPolicyPage = () => {
                 </h2>
                 <div className="bg-gray-800/50 backdrop-blur border border-gray-700/50 rounded-xl p-6">
                   <p className="text-gray-300 mb-4">
-                    We do not sell, trade, or rent your personal information to third parties. We may share 
-                    information only in the following circumstances:
+                    We do not sell, trade, or rent your personal information to
+                    third parties. We may share information only in the
+                    following circumstances:
                   </p>
                   <ul className="text-gray-300 space-y-3">
                     <li className="flex items-start">
@@ -204,7 +255,10 @@ const PrivacyPolicyPage = () => {
                     </li>
                     <li className="flex items-start">
                       <div className="w-2 h-2 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                      <span>With trusted service providers who assist in our operations</span>
+                      <span>
+                        With trusted service providers who assist in our
+                        operations
+                      </span>
                     </li>
                     <li className="flex items-start">
                       <div className="w-2 h-2 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full mt-2 mr-3 flex-shrink-0"></div>
@@ -221,7 +275,9 @@ const PrivacyPolicyPage = () => {
                   Your Rights
                 </h2>
                 <div className="bg-gray-800/50 backdrop-blur border border-gray-700/50 rounded-xl p-6">
-                  <p className="text-gray-300 mb-4">You have the following rights regarding your personal data:</p>
+                  <p className="text-gray-300 mb-4">
+                    You have the following rights regarding your personal data:
+                  </p>
                   <ul className="text-gray-300 space-y-3">
                     <li className="flex items-start">
                       <div className="w-2 h-2 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full mt-2 mr-3 flex-shrink-0"></div>
@@ -259,7 +315,8 @@ const PrivacyPolicyPage = () => {
                 </h2>
                 <div className="bg-gray-800/50 backdrop-blur border border-gray-700/50 rounded-xl p-6">
                   <p className="text-gray-300 mb-4">
-                    If you have any questions about this Privacy Policy or our data practices, please contact us:
+                    If you have any questions about this Privacy Policy or our
+                    data practices, please contact us:
                   </p>
                   <div className="text-gray-300 space-y-2">
                     <p>📧 Email: hello@finarro.com</p>
@@ -272,15 +329,17 @@ const PrivacyPolicyPage = () => {
               {/* Updates */}
               <section>
                 <div className="bg-indigo-900/20 border border-indigo-700/50 rounded-xl p-6">
-                  <h3 className="text-lg font-semibold text-white mb-3">Policy Updates</h3>
+                  <h3 className="text-lg font-semibold text-white mb-3">
+                    Policy Updates
+                  </h3>
                   <p className="text-gray-300">
-                    We may update this Privacy Policy from time to time. We will notify you of any changes 
-                    by posting the new Privacy Policy on this page and updating the "Last updated" date. 
-                    We encourage you to review this Privacy Policy periodically.
+                    We may update this Privacy Policy from time to time. We will
+                    notify you of any changes by posting the new Privacy Policy
+                    on this page and updating the "Last updated" date. We
+                    encourage you to review this Privacy Policy periodically.
                   </p>
                 </div>
               </section>
-
             </div>
           </div>
         </div>
@@ -289,4 +348,4 @@ const PrivacyPolicyPage = () => {
   );
 };
 
-export default PrivacyPolicyPage; 
+export default PrivacyPolicyPage;

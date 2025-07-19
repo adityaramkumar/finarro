@@ -70,13 +70,13 @@ router.post('/link/token/exchange', auth, async (req, res) => {
         balance: account.balances.current || 0,
         currency: account.balances.iso_currency_code || 'USD',
         created_at: new Date(),
-        updated_at: new Date()
+        updated_at: new Date(),
       });
     }
 
-    res.json({ 
-      success: true, 
-      accounts: accountsResponse.data.accounts.length 
+    res.json({
+      success: true,
+      accounts: accountsResponse.data.accounts.length,
     });
   } catch (error) {
     logger.error('Error exchanging token:', error);
@@ -119,23 +119,28 @@ router.post('/sync/transactions', auth, async (req, res) => {
               amount: -transaction.amount, // Plaid uses negative for outflow
               description: transaction.name,
               merchant: transaction.merchant_name,
-              category: transaction.category ? transaction.category[0] : 'Other',
+              category: transaction.category
+                ? transaction.category[0]
+                : 'Other',
               date: transaction.date,
               created_at: new Date(),
-              updated_at: new Date()
+              updated_at: new Date(),
             });
             totalTransactions++;
           }
         }
       } catch (accountError) {
-        logger.error(`Error syncing transactions for account ${account.id}:`, accountError);
+        logger.error(
+          `Error syncing transactions for account ${account.id}:`,
+          accountError
+        );
         continue;
       }
     }
 
-    res.json({ 
-      success: true, 
-      transactions_synced: totalTransactions 
+    res.json({
+      success: true,
+      transactions_synced: totalTransactions,
     });
   } catch (error) {
     logger.error('Error syncing transactions:', error);
@@ -164,22 +169,23 @@ router.get('/accounts/balances', auth, async (req, res) => {
 
         if (plaidAccount) {
           // Update balance in database
-          await db('accounts')
-            .where('id', account.id)
-            .update({
-              balance: plaidAccount.balances.current,
-              updatedAt: new Date()
-            });
+          await db('accounts').where('id', account.id).update({
+            balance: plaidAccount.balances.current,
+            updatedAt: new Date(),
+          });
 
           balances.push({
             account_id: account.id,
             name: account.name,
             balance: plaidAccount.balances.current,
-            currency: plaidAccount.balances.iso_currency_code
+            currency: plaidAccount.balances.iso_currency_code,
           });
         }
       } catch (accountError) {
-        logger.error(`Error fetching balance for account ${account.id}:`, accountError);
+        logger.error(
+          `Error fetching balance for account ${account.id}:`,
+          accountError
+        );
         continue;
       }
     }
@@ -233,7 +239,7 @@ router.post('/webhook', async (req, res) => {
     logger.info('Received Plaid webhook:', {
       webhook_type,
       webhook_code,
-      item_id
+      item_id,
     });
 
     switch (webhook_type) {
@@ -261,4 +267,4 @@ router.post('/webhook', async (req, res) => {
   }
 });
 
-module.exports = router; 
+module.exports = router;

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Home, Search, FileQuestion, Sparkles, ArrowRight } from 'lucide-react';
+import { ArrowLeft, Home, FileQuestion, ArrowRight } from 'lucide-react';
 import Logo from '../components/Logo';
 
 const NotFoundPage = () => {
@@ -26,14 +26,14 @@ const NotFoundPage = () => {
               <FileQuestion className="h-8 w-8 text-indigo-400" />
             </div>
           </div>
-          
+
           <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
             Oops! Page Not Found
           </h2>
-          
+
           <p className="text-gray-400 text-lg leading-relaxed mb-8">
-            The page you're looking for doesn't exist or has been moved. 
-            Don't worry, it happens to the best of us!
+            The page you're looking for doesn't exist or has been moved. Don't
+            worry, it happens to the best of us!
           </p>
         </div>
 
@@ -68,4 +68,4 @@ const NotFoundPage = () => {
   );
 };
 
-export default NotFoundPage; 
+export default NotFoundPage;

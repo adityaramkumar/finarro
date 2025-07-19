@@ -6,4 +6,4 @@ const config = knexConfig[environment];
 
 const db = knex(config);
 
-module.exports = db; 
+module.exports = db;

@@ -9,26 +9,16 @@ const router = express.Router();
 // Generate a short URL-safe unique token
 const generateShareToken = () => {
   // Use 6 random bytes and encode as base64url for a ~8 character string
-  return crypto.randomBytes(6)
+  return crypto
+    .randomBytes(6)
     .toString('base64')
     .replace(/\+/g, '-')
     .replace(/\//g, '_')
     .replace(/=/g, ''); // Remove padding
 };
 
-// Sanitize net worth data for public sharing
-const sanitizeNetWorthData = (data) => {
-  // Only include essential chart data, remove any sensitive information
-  return data.map(point => ({
-    name: point.name, // date/period
-    netWorth: point.netWorth,
-    assets: point.assets,
-    liabilities: point.liabilities
-  }));
-};
-
 // Helper function to generate net worth data for different timeframes
-const generateNetWorthDataForTimeframes = async (userId) => {
+const generateNetWorthDataForTimeframes = async userId => {
   const timeframes = ['7d', '30d', '90d', '1y'];
   const allData = {};
 
@@ -59,19 +49,23 @@ const generateNetWorthDataForTimeframes = async (userId) => {
       .select('*');
 
     const netWorthData = [];
-    
+
     if (accounts.length > 0) {
       // Calculate current total assets and liabilities
       const totalAssets = accounts
-        .filter(acc => ['checking', 'savings', 'investment'].includes(acc.account_type))
+        .filter(acc =>
+          ['checking', 'savings', 'investment'].includes(acc.account_type)
+        )
         .reduce((sum, acc) => sum + parseFloat(acc.current_balance || 0), 0);
-      
-      const totalLiabilities = Math.abs(accounts
-        .filter(acc => acc.account_type === 'credit')
-        .reduce((sum, acc) => sum + parseFloat(acc.current_balance || 0), 0));
-      
+
+      const totalLiabilities = Math.abs(
+        accounts
+          .filter(acc => acc.account_type === 'credit')
+          .reduce((sum, acc) => sum + parseFloat(acc.current_balance || 0), 0)
+      );
+
       const currentNetWorth = totalAssets - totalLiabilities;
-      
+
       // Generate data points based on timeframe
       let dataPoints;
       switch (timeframe) {
@@ -93,74 +87,94 @@ const generateNetWorthDataForTimeframes = async (userId) => {
 
       for (let i = dataPoints - 1; i >= 0; i--) {
         const pointDate = new Date();
-        
+
         if (timeframe === '7d') {
           pointDate.setDate(pointDate.getDate() - i);
         } else if (timeframe === '30d') {
-          pointDate.setDate(pointDate.getDate() - (i * 5)); // Every 5 days
+          pointDate.setDate(pointDate.getDate() - i * 5); // Every 5 days
         } else if (timeframe === '90d') {
-          pointDate.setDate(pointDate.getDate() - (i * 15)); // Every 15 days
+          pointDate.setDate(pointDate.getDate() - i * 15); // Every 15 days
         } else if (timeframe === '1y') {
           pointDate.setMonth(pointDate.getMonth() - i);
         }
-        
+
         // Simulate gradual net worth growth over time
         const growthFactor = 1 + (Math.random() * 0.02 + 0.01) * i; // 1-3% growth per period
-        const historicalNetWorth = Math.max(currentNetWorth / growthFactor, 1000);
+        const historicalNetWorth = Math.max(
+          currentNetWorth / growthFactor,
+          1000
+        );
         const historicalAssets = Math.max(totalAssets / growthFactor, 1000);
-        const historicalLiabilities = totalLiabilities / Math.max(growthFactor * 0.8, 1);
-        
+        const historicalLiabilities =
+          totalLiabilities / Math.max(growthFactor * 0.8, 1);
+
         let nameFormat;
         if (timeframe === '7d') {
-          nameFormat = pointDate.toLocaleDateString('en-US', { weekday: 'short' });
+          nameFormat = pointDate.toLocaleDateString('en-US', {
+            weekday: 'short',
+          });
         } else if (timeframe === '1y') {
-          nameFormat = pointDate.toLocaleDateString('en-US', { month: 'short' });
+          nameFormat = pointDate.toLocaleDateString('en-US', {
+            month: 'short',
+          });
         } else {
-          nameFormat = pointDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+          nameFormat = pointDate.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+          });
         }
 
         netWorthData.push({
           name: nameFormat,
           netWorth: Math.round(historicalNetWorth),
           assets: Math.round(historicalAssets),
-          liabilities: Math.round(historicalLiabilities)
+          liabilities: Math.round(historicalLiabilities),
         });
       }
     } else {
       // Generate sample data for each timeframe
       const baseNetWorth = 25000;
       const dataPoints = timeframe === '7d' ? 7 : timeframe === '1y' ? 12 : 6;
-      
+
       for (let i = dataPoints - 1; i >= 0; i--) {
         const pointDate = new Date();
-        
+
         if (timeframe === '7d') {
           pointDate.setDate(pointDate.getDate() - i);
         } else if (timeframe === '1y') {
           pointDate.setMonth(pointDate.getMonth() - i);
         } else {
-          pointDate.setDate(pointDate.getDate() - (i * (timeframe === '30d' ? 5 : 15)));
+          pointDate.setDate(
+            pointDate.getDate() - i * (timeframe === '30d' ? 5 : 15)
+          );
         }
-        
-        const growthFactor = 1 + (0.02 * (dataPoints - 1 - i)); // 2% growth per period
+
+        const growthFactor = 1 + 0.02 * (dataPoints - 1 - i); // 2% growth per period
         const netWorth = Math.round(baseNetWorth * growthFactor);
         const assets = Math.round(netWorth * 1.2);
         const liabilities = assets - netWorth;
-        
+
         let nameFormat;
         if (timeframe === '7d') {
-          nameFormat = pointDate.toLocaleDateString('en-US', { weekday: 'short' });
+          nameFormat = pointDate.toLocaleDateString('en-US', {
+            weekday: 'short',
+          });
         } else if (timeframe === '1y') {
-          nameFormat = pointDate.toLocaleDateString('en-US', { month: 'short' });
+          nameFormat = pointDate.toLocaleDateString('en-US', {
+            month: 'short',
+          });
         } else {
-          nameFormat = pointDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+          nameFormat = pointDate.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+          });
         }
 
         netWorthData.push({
           name: nameFormat,
           netWorth: netWorth,
           assets: assets,
-          liabilities: liabilities
+          liabilities: liabilities,
         });
       }
     }
@@ -174,14 +188,16 @@ const generateNetWorthDataForTimeframes = async (userId) => {
 // Create a shareable chart (or return existing one)
 router.post('/charts', auth, async (req, res) => {
   try {
-    const { 
-      title = 'My Net Worth Growth', 
+    const {
+      title = 'My Net Worth Growth',
       timeframe = '30d',
-      expiresInDays = null 
+      expiresInDays = null,
     } = req.body;
 
     // Generate data for all timeframes
-    const allTimeframeData = await generateNetWorthDataForTimeframes(req.user.id);
+    const allTimeframeData = await generateNetWorthDataForTimeframes(
+      req.user.id
+    );
 
     // Check if user already has an active net worth share
     const existingShare = await db('shared_charts')
@@ -198,7 +214,7 @@ router.post('/charts', auth, async (req, res) => {
           title: title,
           chart_data: JSON.stringify(allTimeframeData),
           settings: JSON.stringify({ defaultTimeframe: timeframe }),
-          updated_at: new Date()
+          updated_at: new Date(),
         });
 
       // Return existing share URL
@@ -212,30 +228,32 @@ router.post('/charts', auth, async (req, res) => {
         title,
         expiresAt: existingShare.expires_at,
         message: 'Share link updated with latest data',
-        isExisting: true
+        isExisting: true,
       });
     }
 
     // Generate unique share token for new share
     const shareToken = generateShareToken();
-    
+
     // Calculate expiration date if specified
-    const expiresAt = expiresInDays 
-      ? new Date(Date.now() + (expiresInDays * 24 * 60 * 60 * 1000))
+    const expiresAt = expiresInDays
+      ? new Date(Date.now() + expiresInDays * 24 * 60 * 60 * 1000)
       : null;
 
     // Store in database
-    const [shareId] = await db('shared_charts').insert({
-      user_id: req.user.id,
-      share_token: shareToken,
-      chart_type: 'net_worth',
-      title: title,
-      chart_data: JSON.stringify(allTimeframeData),
-      settings: JSON.stringify({ defaultTimeframe: timeframe }),
-      expires_at: expiresAt,
-      created_at: new Date(),
-      updated_at: new Date()
-    }).returning('id');
+    await db('shared_charts')
+      .insert({
+        user_id: req.user.id,
+        share_token: shareToken,
+        chart_type: 'net_worth',
+        title: title,
+        chart_data: JSON.stringify(allTimeframeData),
+        settings: JSON.stringify({ defaultTimeframe: timeframe }),
+        expires_at: expiresAt,
+        created_at: new Date(),
+        updated_at: new Date(),
+      })
+      .returning('id');
 
     // Create the shareable URL - point to frontend
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
@@ -248,9 +266,8 @@ router.post('/charts', auth, async (req, res) => {
       title,
       expiresAt,
       message: 'Shareable chart created successfully',
-      isExisting: false
+      isExisting: false,
     });
-
   } catch (error) {
     logger.error('Error creating shared chart:', error);
     res.status(500).json({ error: 'Failed to create shareable chart' });
@@ -269,11 +286,16 @@ router.get('/:token', async (req, res) => {
       .first();
 
     if (!sharedChart) {
-      return res.status(404).json({ error: 'Shared chart not found or no longer available' });
+      return res
+        .status(404)
+        .json({ error: 'Shared chart not found or no longer available' });
     }
 
     // Check if expired
-    if (sharedChart.expires_at && new Date() > new Date(sharedChart.expires_at)) {
+    if (
+      sharedChart.expires_at &&
+      new Date() > new Date(sharedChart.expires_at)
+    ) {
       return res.status(410).json({ error: 'This shared chart has expired' });
     }
 
@@ -283,11 +305,14 @@ router.get('/:token', async (req, res) => {
       .increment('view_count', 1);
 
     // Parse the chart data (handle both string and object cases)
-    const chartData = typeof sharedChart.chart_data === 'string' 
-      ? JSON.parse(sharedChart.chart_data) 
-      : sharedChart.chart_data;
-    const settings = sharedChart.settings 
-      ? (typeof sharedChart.settings === 'string' ? JSON.parse(sharedChart.settings) : sharedChart.settings)
+    const chartData =
+      typeof sharedChart.chart_data === 'string'
+        ? JSON.parse(sharedChart.chart_data)
+        : sharedChart.chart_data;
+    const settings = sharedChart.settings
+      ? typeof sharedChart.settings === 'string'
+        ? JSON.parse(sharedChart.settings)
+        : sharedChart.settings
       : {};
 
     // Return the public chart data
@@ -298,9 +323,8 @@ router.get('/:token', async (req, res) => {
       chartData,
       settings,
       createdAt: sharedChart.created_at,
-      viewCount: sharedChart.view_count + 1 // Include the current view
+      viewCount: sharedChart.view_count + 1, // Include the current view
     });
-
   } catch (error) {
     logger.error('Error fetching shared chart:', error);
     res.status(500).json({ error: 'Failed to load shared chart' });
@@ -313,7 +337,14 @@ router.get('/user/charts', auth, async (req, res) => {
     const sharedCharts = await db('shared_charts')
       .where('user_id', req.user.id)
       .where('is_active', true)
-      .select('id', 'share_token', 'title', 'view_count', 'expires_at', 'created_at')
+      .select(
+        'id',
+        'share_token',
+        'title',
+        'view_count',
+        'expires_at',
+        'created_at'
+      )
       .orderBy('created_at', 'desc');
 
     // Add full URLs - point to frontend
@@ -321,14 +352,15 @@ router.get('/user/charts', auth, async (req, res) => {
     const chartsWithUrls = sharedCharts.map(chart => ({
       ...chart,
       shareUrl: `${frontendUrl}/share/${chart.share_token}`,
-      isExpired: chart.expires_at ? new Date() > new Date(chart.expires_at) : false
+      isExpired: chart.expires_at
+        ? new Date() > new Date(chart.expires_at)
+        : false,
     }));
 
     res.json({
       success: true,
-      sharedCharts: chartsWithUrls
+      sharedCharts: chartsWithUrls,
     });
-
   } catch (error) {
     logger.error('Error fetching user shared charts:', error);
     res.status(500).json({ error: 'Failed to load shared charts' });
@@ -346,22 +378,24 @@ router.delete('/:token', auth, async (req, res) => {
       .where('user_id', req.user.id)
       .update({
         is_active: false,
-        updated_at: new Date()
+        updated_at: new Date(),
       });
 
     if (updated === 0) {
-      return res.status(404).json({ error: 'Shared chart not found or you do not have permission to delete it' });
+      return res.status(404).json({
+        error:
+          'Shared chart not found or you do not have permission to delete it',
+      });
     }
 
     res.json({
       success: true,
-      message: 'Shared chart deleted successfully'
+      message: 'Shared chart deleted successfully',
     });
-
   } catch (error) {
     logger.error('Error deleting shared chart:', error);
     res.status(500).json({ error: 'Failed to delete shared chart' });
   }
 });
 
-module.exports = router; 
+module.exports = router;

@@ -1,9 +1,12 @@
 {
   "extends": [
     "react-app",
-    "react-app/jest"
+    "react-app/jest",
+    "prettier"
   ],
+  "plugins": ["prettier"],
   "rules": {
+    "prettier/prettier": "error",
     "no-console": "warn",
     "no-unused-vars": "warn",
     "no-undef": "warn",

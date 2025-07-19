@@ -48,7 +48,7 @@ Please provide a helpful, accurate, and personalized response. Be concise but th
       conversation_id: currentConversationId,
       role: 'user',
       content: message,
-      context_data: userContext
+      context_data: userContext,
     });
 
     // Save AI response
@@ -57,12 +57,12 @@ Please provide a helpful, accurate, and personalized response. Be concise but th
       conversation_id: currentConversationId,
       role: 'assistant',
       content: aiResponse,
-      context_data: userContext
+      context_data: userContext,
     });
 
     res.json({
       response: aiResponse,
-      conversationId: currentConversationId
+      conversationId: currentConversationId,
     });
 
     logger.info(`AI chat interaction for user: ${req.user.email}`);
@@ -102,7 +102,11 @@ router.get('/conversations', auth, async (req, res) => {
       .select('conversation_id')
       .select(db.raw('MAX(created_at) as last_message_at'))
       .select(db.raw('COUNT(*) as message_count'))
-      .select(db.raw('MAX(CASE WHEN role = "user" THEN content END) as last_user_message'))
+      .select(
+        db.raw(
+          'MAX(CASE WHEN role = "user" THEN content END) as last_user_message'
+        )
+      )
       .groupBy('conversation_id')
       .orderBy('last_message_at', 'desc')
       .limit(limit)
@@ -125,7 +129,9 @@ router.post('/insights', auth, async (req, res) => {
     const userContext = await getUserFinancialContext(userId, timeframe);
 
     if (!userContext.transactions || userContext.transactions.length === 0) {
-      return res.status(400).json({ error: 'Not enough financial data to generate insights' });
+      return res
+        .status(400)
+        .json({ error: 'Not enough financial data to generate insights' });
     }
 
     const prompt = `Analyze the following financial data and provide actionable insights and recommendations for the user. Focus on spending patterns, budgeting opportunities, and financial health.
@@ -158,7 +164,7 @@ Keep the response concise but comprehensive.`;
 async function getUserFinancialContext(userId, timeframe = '30days') {
   try {
     const dateFilter = new Date();
-    
+
     // Calculate date range based on timeframe
     switch (timeframe) {
       case '7days':
@@ -180,7 +186,13 @@ async function getUserFinancialContext(userId, timeframe = '30days') {
     // Get user's accounts
     const accounts = await db('accounts')
       .where({ user_id: userId, is_active: true })
-      .select('id', 'account_name', 'account_type', 'current_balance', 'available_balance');
+      .select(
+        'id',
+        'account_name',
+        'account_type',
+        'current_balance',
+        'available_balance'
+      );
 
     // Get recent transactions
     const transactions = await db('transactions')
@@ -204,15 +216,23 @@ async function getUserFinancialContext(userId, timeframe = '30days') {
     const monthlyData = await db('transactions')
       .where({ user_id: userId })
       .where('date', '>=', dateFilter)
-      .select(db.raw('DATE_TRUNC(\'month\', date) as month'))
-      .select(db.raw('SUM(CASE WHEN amount > 0 THEN amount ELSE 0 END) as income'))
-      .select(db.raw('SUM(CASE WHEN amount < 0 THEN ABS(amount) ELSE 0 END) as expenses'))
-      .groupBy(db.raw('DATE_TRUNC(\'month\', date)'))
+      .select(db.raw("DATE_TRUNC('month', date) as month"))
+      .select(
+        db.raw('SUM(CASE WHEN amount > 0 THEN amount ELSE 0 END) as income')
+      )
+      .select(
+        db.raw(
+          'SUM(CASE WHEN amount < 0 THEN ABS(amount) ELSE 0 END) as expenses'
+        )
+      )
+      .groupBy(db.raw("DATE_TRUNC('month', date)"))
       .orderBy('month');
 
     // Get total balances
     const totalBalances = accounts.reduce((acc, account) => {
-      acc[account.account_type] = (acc[account.account_type] || 0) + parseFloat(account.current_balance || 0);
+      acc[account.account_type] =
+        (acc[account.account_type] || 0) +
+        parseFloat(account.current_balance || 0);
       return acc;
     }, {});
 
@@ -224,7 +244,7 @@ async function getUserFinancialContext(userId, timeframe = '30days') {
       monthlyData,
       totalBalances,
       accountCount: accounts.length,
-      transactionCount: transactions.length
+      transactionCount: transactions.length,
     };
   } catch (error) {
     logger.error('Error getting user financial context:', error);
@@ -232,4 +252,4 @@ async function getUserFinancialContext(userId, timeframe = '30days') {
   }
 }
 
-module.exports = router; 
+module.exports = router;

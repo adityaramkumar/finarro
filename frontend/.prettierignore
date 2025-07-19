@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+build/
+dist/
+coverage/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Runtime data
+.DS_Store
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Build outputs
+public/manifest.json
+public/index.html
+
+# Package files
+package-lock.json
+yarn.lock 

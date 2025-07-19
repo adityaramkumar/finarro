@@ -31,14 +31,14 @@ app.use(compression());
 // Rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100 // limit each IP to 100 requests per windowMs
+  max: 100, // limit each IP to 100 requests per windowMs
 });
 app.use('/api/', limiter);
 
 // Stricter rate limiting for auth routes
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 500 // 500 requests per 15 minutes for both dev and prod
+  max: 500, // 500 requests per 15 minutes for both dev and prod
 });
 app.use('/api/auth', authLimiter);
 
@@ -48,22 +48,26 @@ const allowedOrigins = [
   'http://finarro-frontend.s3-website.us-east-2.amazonaws.com',
   'https://finarro.com',
   'https://www.finarro.com',
-  'https://d2ebzpcgudiii8.cloudfront.net'
+  'https://d2ebzpcgudiii8.cloudfront.net',
 ];
 
-app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (mobile apps, postman, etc.)
-    if (!origin) {return callback(null, true);}
-    
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Allow requests with no origin (mobile apps, postman, etc.)
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true,
+  })
+);
 
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
@@ -71,23 +75,25 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // Logging
-app.use(morgan('combined', { stream: { write: message => logger.info(message) } }));
+app.use(
+  morgan('combined', { stream: { write: message => logger.info(message) } })
+);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
-  res.json({ 
-    status: 'OK', 
+  res.json({
+    status: 'OK',
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development'
+    environment: process.env.NODE_ENV || 'development',
   });
 });
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-  res.json({ 
-    status: 'ok', 
+  res.json({
+    status: 'ok',
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development'
+    environment: process.env.NODE_ENV || 'development',
   });
 });
 
@@ -109,7 +115,9 @@ app.use(errorHandler);
 
 // Start server
 app.listen(PORT, () => {
-  logger.info(`Server running on port ${PORT} in ${process.env.NODE_ENV || 'development'} mode`);
+  logger.info(
+    `Server running on port ${PORT} in ${process.env.NODE_ENV || 'development'} mode`
+  );
 });
 
-module.exports = app; 
+module.exports = app;

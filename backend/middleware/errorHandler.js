@@ -6,7 +6,7 @@ const notFound = (req, res, next) => {
   next(error);
 };
 
-const errorHandler = (err, req, res, next) => {
+const errorHandler = (err, req, res) => {
   let statusCode = res.statusCode === 200 ? 500 : res.statusCode;
   let message = err.message;
 
@@ -34,7 +34,7 @@ const errorHandler = (err, req, res, next) => {
   // Mongoose validation error
   if (err.name === 'ValidationError') {
     statusCode = 400;
-    message = Object.values(err.errors).map((val) => val.message);
+    message = Object.values(err.errors).map(val => val.message);
   }
 
   // JWT errors
@@ -57,4 +57,4 @@ const errorHandler = (err, req, res, next) => {
 module.exports = {
   notFound,
   errorHandler,
-}; 
+};

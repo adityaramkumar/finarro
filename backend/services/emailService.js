@@ -9,8 +9,8 @@ const createTransporter = () => {
     secure: false, // true for 465, false for other ports
     auth: {
       user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASSWORD
-    }
+      pass: process.env.SMTP_PASSWORD,
+    },
   });
 };
 
@@ -22,18 +22,18 @@ const sendEmail = async (to, subject, html) => {
       logger.info('Email would be sent:', {
         to,
         subject,
-        html
+        html,
       });
       return { success: true, message: 'Email logged (development mode)' };
     }
 
     const transporter = createTransporter();
-    
+
     const mailOptions = {
       from: process.env.FROM_EMAIL,
       to,
       subject,
-      html
+      html,
     };
 
     const info = await transporter.sendMail(mailOptions);
@@ -62,7 +62,7 @@ const emailTemplates = {
       <p>Best regards,<br>The Financier Team</p>
     </div>
   `,
-  
+
   passwordReset: (name, token) => `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <h2 style="color: #333;">Reset Your Password</h2>
@@ -78,10 +78,10 @@ const emailTemplates = {
       <p>If you didn't request this, please ignore this email.</p>
       <p>Best regards,<br>The Financier Team</p>
     </div>
-  `
+  `,
 };
 
 module.exports = {
   sendEmail,
-  emailTemplates
-}; 
+  emailTemplates,
+};

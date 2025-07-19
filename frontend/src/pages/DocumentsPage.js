@@ -1,5 +1,18 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Upload, FileText, Sparkles, Download, Eye, Trash2, Filter, Search, Plus, BarChart3, Clock, CheckCircle, X, AlertCircle, FileCheck } from 'lucide-react';
+import {
+  Upload,
+  FileText,
+  Sparkles,
+  Download,
+  Eye,
+  Trash2,
+  Search,
+  Plus,
+  BarChart3,
+  Clock,
+  CheckCircle,
+  FileCheck,
+} from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { documentsApi } from '../services/api';
 
@@ -21,18 +34,16 @@ const DocumentsPage = () => {
       try {
         setIsLoading(true);
         const response = await documentsApi.getDocuments();
-        
+
         // Transform documents to match frontend expectations
         const transformedDocuments = (response.data || []).map(doc => {
           let analysis = null;
           if (doc.ai_analysis) {
             try {
               analysis = JSON.parse(doc.ai_analysis);
-            } catch (e) {
-              console.error('Error parsing AI analysis:', e);
-            }
+            } catch (e) {}
           }
-          
+
           return {
             id: doc.id,
             name: doc.original_filename,
@@ -41,16 +52,15 @@ const DocumentsPage = () => {
             status: doc.is_processed ? 'analyzed' : 'pending',
             uploadDate: doc.created_at,
             summary: analysis?.summary || null,
-            insights: analysis?.insights || null
+            insights: analysis?.insights || null,
           };
         });
-        
+
         setDocuments(transformedDocuments);
       } catch (error) {
-        console.error('Error loading documents:', error);
-        console.error('Error details:', error.response?.data);
-        console.error('Error status:', error.response?.status);
-        toast.error(`Failed to load documents: ${error.response?.data?.error || error.message}`);
+        toast.error(
+          `Failed to load documents: ${error.response?.data?.error || error.message}`
+        );
         setDocuments([]);
       } finally {
         setIsLoading(false);
@@ -61,19 +71,31 @@ const DocumentsPage = () => {
   }, []);
 
   const filteredDocuments = documents.filter(doc => {
-    const matchesFilter = selectedFilter === 'all' || doc.type.toLowerCase().includes(selectedFilter.toLowerCase());
-    const matchesSearch = doc.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                         doc.type.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesFilter =
+      selectedFilter === 'all' ||
+      doc.type.toLowerCase().includes(selectedFilter.toLowerCase());
+    const matchesSearch =
+      doc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      doc.type.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesFilter && matchesSearch;
   });
 
   // File validation
-  const validateFile = (file) => {
-    const allowedTypes = ['application/pdf', 'text/csv', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
+  const validateFile = file => {
+    const allowedTypes = [
+      'application/pdf',
+      'text/csv',
+      'application/vnd.ms-excel',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    ];
     const maxSize = 10 * 1024 * 1024; // 10MB
 
     if (!allowedTypes.includes(file.type)) {
-      return { valid: false, error: 'File type not supported. Please upload PDF, CSV, or Excel files.' };
+      return {
+        valid: false,
+        error:
+          'File type not supported. Please upload PDF, CSV, or Excel files.',
+      };
     }
 
     if (file.size > maxSize) {
@@ -84,7 +106,7 @@ const DocumentsPage = () => {
   };
 
   // Format file size
-  const formatFileSize = (bytes) => {
+  const formatFileSize = bytes => {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
@@ -93,17 +115,26 @@ const DocumentsPage = () => {
   };
 
   // Get document type from file
-  const getDocumentType = (fileName) => {
+  const getDocumentType = fileName => {
     const lowerName = fileName.toLowerCase();
-    if (lowerName.includes('bank') || lowerName.includes('statement')) return 'Bank Statement';
-    if (lowerName.includes('credit') || lowerName.includes('card')) return 'Credit Card';
-    if (lowerName.includes('tax') || lowerName.includes('1099') || lowerName.includes('w2')) return 'Tax Document';
-    if (lowerName.includes('investment') || lowerName.includes('portfolio')) return 'Investment Report';
-    if (lowerName.includes('loan') || lowerName.includes('mortgage')) return 'Loan Statement';
+    if (lowerName.includes('bank') || lowerName.includes('statement'))
+      return 'Bank Statement';
+    if (lowerName.includes('credit') || lowerName.includes('card'))
+      return 'Credit Card';
+    if (
+      lowerName.includes('tax') ||
+      lowerName.includes('1099') ||
+      lowerName.includes('w2')
+    )
+      return 'Tax Document';
+    if (lowerName.includes('investment') || lowerName.includes('portfolio'))
+      return 'Investment Report';
+    if (lowerName.includes('loan') || lowerName.includes('mortgage'))
+      return 'Loan Statement';
     return 'Other Document';
   };
 
-  const handleDrag = (e) => {
+  const handleDrag = e => {
     e.preventDefault();
     e.stopPropagation();
     if (e.type === 'dragenter' || e.type === 'dragover') {
@@ -113,17 +144,17 @@ const DocumentsPage = () => {
     }
   };
 
-  const handleDrop = (e) => {
+  const handleDrop = e => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-    
+
     const files = Array.from(e.dataTransfer.files);
     handleFileUpload(files);
   };
 
   // Handle file upload
-  const handleFileUpload = async (files) => {
+  const handleFileUpload = async files => {
     if (files.length === 0) return;
 
     // Validate files
@@ -141,21 +172,25 @@ const DocumentsPage = () => {
 
     setIsUploading(true);
     setUploadProgress(0);
-    setUploadingFiles(validFiles.map(file => ({ 
-      name: file.name, 
-      size: formatFileSize(file.size), 
-      progress: 0,
-      status: 'uploading'
-    })));
+    setUploadingFiles(
+      validFiles.map(file => ({
+        name: file.name,
+        size: formatFileSize(file.size),
+        progress: 0,
+        status: 'uploading',
+      }))
+    );
 
     try {
       for (let i = 0; i < validFiles.length; i++) {
         const file = validFiles[i];
-        
+
         // Update current file progress
-        setUploadingFiles(prev => prev.map((f, index) => 
-          index === i ? { ...f, status: 'uploading' } : f
-        ));
+        setUploadingFiles(prev =>
+          prev.map((f, index) =>
+            index === i ? { ...f, status: 'uploading' } : f
+          )
+        );
 
         // Create form data for upload
         const formData = new FormData();
@@ -165,7 +200,7 @@ const DocumentsPage = () => {
         try {
           // Upload to API
           const response = await documentsApi.uploadDocument(formData);
-          
+
           // Transform response to match frontend expectations
           const newDoc = {
             id: response.data.id,
@@ -175,28 +210,31 @@ const DocumentsPage = () => {
             status: response.data.is_processed ? 'analyzed' : 'pending',
             uploadDate: response.data.created_at,
             summary: null,
-            insights: null
+            insights: null,
           };
 
           setDocuments(prev => [newDoc, ...prev]);
-          
+
           // Mark as complete
-          setUploadingFiles(prev => prev.map((f, index) => 
-            index === i ? { ...f, status: 'complete', progress: 100 } : f
-          ));
-          
+          setUploadingFiles(prev =>
+            prev.map((f, index) =>
+              index === i ? { ...f, status: 'complete', progress: 100 } : f
+            )
+          );
+
           setUploadProgress(((i + 1) * 100) / validFiles.length);
         } catch (uploadError) {
-          console.error('Error uploading file:', uploadError);
-          setUploadingFiles(prev => prev.map((f, index) => 
-            index === i ? { ...f, status: 'error', progress: 0 } : f
-          ));
-          
+          setUploadingFiles(prev =>
+            prev.map((f, index) =>
+              index === i ? { ...f, status: 'error', progress: 0 } : f
+            )
+          );
+
           // Handle duplicate file detection
           if (uploadError.response?.status === 409) {
             toast.error(`${file.name} already exists in your account`, {
               icon: '📁',
-              duration: 4000
+              duration: 4000,
             });
           } else {
             toast.error(`Failed to upload ${file.name}`);
@@ -204,13 +242,16 @@ const DocumentsPage = () => {
         }
       }
 
-      const successCount = uploadingFiles.filter(f => f.status === 'complete').length;
+      const successCount = uploadingFiles.filter(
+        f => f.status === 'complete'
+      ).length;
       if (successCount > 0) {
-        toast.success(`Successfully uploaded ${successCount} file${successCount > 1 ? 's' : ''}`);
+        toast.success(
+          `Successfully uploaded ${successCount} file${successCount > 1 ? 's' : ''}`
+        );
       }
     } catch (error) {
       toast.error('Upload failed. Please try again.');
-      console.error('Upload error:', error);
     } finally {
       setIsUploading(false);
       setUploadProgress(0);
@@ -219,7 +260,7 @@ const DocumentsPage = () => {
   };
 
   // Handle file input change
-  const handleFileInputChange = (e) => {
+  const handleFileInputChange = e => {
     const files = Array.from(e.target.files);
     handleFileUpload(files);
     e.target.value = ''; // Reset input
@@ -234,26 +275,28 @@ const DocumentsPage = () => {
   const handleDeleteDocument = async (documentId, documentName) => {
     // Prevent multiple clicks
     if (deletingDocuments.has(documentId)) return;
-    
+
     // Show confirmation dialog
-    const confirmed = window.confirm(`Are you sure you want to delete "${documentName}"? This action cannot be undone.`);
-    
+    // eslint-disable-next-line no-alert
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${documentName}"? This action cannot be undone.`
+    );
+
     if (!confirmed) return;
 
     try {
       // Add to deleting set
       setDeletingDocuments(prev => new Set(prev).add(documentId));
-      
+
       // Call API to delete document
       await documentsApi.deleteDocument(documentId);
-      
+
       // Remove document from state
       setDocuments(prev => prev.filter(doc => doc.id !== documentId));
-      
+
       // Show success message
       toast.success(`Successfully deleted "${documentName}"`);
     } catch (error) {
-      console.error('Error deleting document:', error);
       toast.error('Failed to delete document. Please try again.');
     } finally {
       // Remove from deleting set
@@ -269,56 +312,70 @@ const DocumentsPage = () => {
   const handleAnalyzeDocument = async (documentId, documentName) => {
     try {
       // Update document status to analyzing
-      setDocuments(prev => prev.map(doc => 
-        doc.id === documentId ? { ...doc, status: 'analyzing' } : doc
-      ));
+      setDocuments(prev =>
+        prev.map(doc =>
+          doc.id === documentId ? { ...doc, status: 'analyzing' } : doc
+        )
+      );
 
       // Call API to analyze document
       const response = await documentsApi.analyzeDocument(documentId);
-      
+
       // Update document with analysis results
-      setDocuments(prev => prev.map(doc => 
-        doc.id === documentId ? { 
-          ...doc, 
-          status: 'analyzed',
-          summary: response.data.summary,
-          insights: response.data.insights || []
-        } : doc
-      ));
-      
+      setDocuments(prev =>
+        prev.map(doc =>
+          doc.id === documentId
+            ? {
+                ...doc,
+                status: 'analyzed',
+                summary: response.data.summary,
+                insights: response.data.insights || [],
+              }
+            : doc
+        )
+      );
+
       // Show success message
       toast.success(`Successfully analyzed "${documentName}"`);
     } catch (error) {
-      console.error('Error analyzing document:', error);
-      
       // Reset status on error
-      setDocuments(prev => prev.map(doc => 
-        doc.id === documentId ? { ...doc, status: 'pending' } : doc
-      ));
-      
+      setDocuments(prev =>
+        prev.map(doc =>
+          doc.id === documentId ? { ...doc, status: 'pending' } : doc
+        )
+      );
+
       toast.error('Failed to analyze document. Please try again.');
     }
   };
 
-  const getStatusColor = (status) => {
+  const getStatusColor = status => {
     switch (status) {
-      case 'analyzed': return 'text-green-400 bg-green-400/10 border-green-400/20';
-      case 'analyzing': return 'text-yellow-400 bg-yellow-400/10 border-yellow-400/20';
-      case 'pending': return 'text-gray-400 bg-gray-400/10 border-gray-400/20';
-      default: return 'text-gray-400 bg-gray-400/10 border-gray-400/20';
+      case 'analyzed':
+        return 'text-green-400 bg-green-400/10 border-green-400/20';
+      case 'analyzing':
+        return 'text-yellow-400 bg-yellow-400/10 border-yellow-400/20';
+      case 'pending':
+        return 'text-gray-400 bg-gray-400/10 border-gray-400/20';
+      default:
+        return 'text-gray-400 bg-gray-400/10 border-gray-400/20';
     }
   };
 
-  const getStatusIcon = (status) => {
+  const getStatusIcon = status => {
     switch (status) {
-      case 'analyzed': return <CheckCircle className="h-4 w-4" />;
-      case 'analyzing': return <Clock className="h-4 w-4 animate-spin" />;
-      case 'pending': return <Clock className="h-4 w-4" />;
-      default: return <Clock className="h-4 w-4" />;
+      case 'analyzed':
+        return <CheckCircle className="h-4 w-4" />;
+      case 'analyzing':
+        return <Clock className="h-4 w-4 animate-spin" />;
+      case 'pending':
+        return <Clock className="h-4 w-4" />;
+      default:
+        return <Clock className="h-4 w-4" />;
     }
   };
 
-  const getTypeIcon = (type) => {
+  const getTypeIcon = type => {
     return <FileText className="h-5 w-5 text-indigo-400" />;
   };
 
@@ -328,9 +385,13 @@ const DocumentsPage = () => {
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
         <div>
           <h1 className="text-4xl font-bold text-white">
-            <span className="text-transparent bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text">Documents</span>
+            <span className="text-transparent bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text">
+              Documents
+            </span>
           </h1>
-          <p className="text-gray-400 mt-3 text-xl">Upload and analyze your financial documents with AI</p>
+          <p className="text-gray-400 mt-3 text-xl">
+            Upload and analyze your financial documents with AI
+          </p>
         </div>
         <div className="flex items-center space-x-4">
           <div className="relative">
@@ -339,13 +400,13 @@ const DocumentsPage = () => {
               type="text"
               placeholder="Search documents..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={e => setSearchTerm(e.target.value)}
               className="pl-10 pr-4 py-2.5 bg-gray-800/50 backdrop-blur border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all hover:bg-gray-800/70 w-64"
             />
           </div>
           <select
             value={selectedFilter}
-            onChange={(e) => setSelectedFilter(e.target.value)}
+            onChange={e => setSelectedFilter(e.target.value)}
             className="bg-gray-800/50 backdrop-blur text-white border border-gray-600/50 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all hover:bg-gray-800/70 cursor-pointer"
           >
             <option value="all">All Types</option>
@@ -359,10 +420,10 @@ const DocumentsPage = () => {
       </div>
 
       {/* Modern Upload Area */}
-      <div 
+      <div
         className={`border-2 border-dashed rounded-2xl p-12 text-center transition-all duration-300 ${
-          dragActive 
-            ? 'border-indigo-500 bg-indigo-500/10 scale-105' 
+          dragActive
+            ? 'border-indigo-500 bg-indigo-500/10 scale-105'
             : 'border-gray-600/50 hover:border-gray-500/50 hover:bg-gray-800/20'
         }`}
         onDragEnter={handleDrag}
@@ -389,7 +450,7 @@ const DocumentsPage = () => {
               accept=".pdf,.csv,.xls,.xlsx"
               className="hidden"
             />
-            <button 
+            <button
               onClick={handleChooseFiles}
               disabled={isUploading}
               className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed text-white px-8 py-3 rounded-xl transition-all duration-200 shadow-lg hover:shadow-indigo-500/25 hover:scale-105 active:scale-95 flex items-center space-x-2"
@@ -408,12 +469,16 @@ const DocumentsPage = () => {
       {isUploading && (
         <div className="bg-gray-950/30 backdrop-blur border border-gray-800/50 rounded-2xl p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-white">Uploading Files</h3>
-            <span className="text-sm text-gray-400">{Math.round(uploadProgress)}%</span>
+            <h3 className="text-lg font-semibold text-white">
+              Uploading Files
+            </h3>
+            <span className="text-sm text-gray-400">
+              {Math.round(uploadProgress)}%
+            </span>
           </div>
-          
+
           <div className="w-full bg-gray-800 rounded-full h-2 mb-6">
-            <div 
+            <div
               className="bg-gradient-to-r from-indigo-500 to-purple-500 h-2 rounded-full transition-all duration-300"
               style={{ width: `${uploadProgress}%` }}
             ></div>
@@ -421,7 +486,10 @@ const DocumentsPage = () => {
 
           <div className="space-y-3">
             {uploadingFiles.map((file, index) => (
-              <div key={index} className="flex items-center justify-between p-3 bg-gray-800/50 rounded-xl">
+              <div
+                key={index}
+                className="flex items-center justify-between p-3 bg-gray-800/50 rounded-xl"
+              >
                 <div className="flex items-center space-x-3">
                   <div className="p-2 bg-indigo-500/20 rounded-lg">
                     {file.status === 'complete' ? (
@@ -431,18 +499,22 @@ const DocumentsPage = () => {
                     )}
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-white">{file.name}</p>
+                    <p className="text-sm font-medium text-white">
+                      {file.name}
+                    </p>
                     <p className="text-xs text-gray-400">{file.size}</p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
                   <div className="w-16 bg-gray-700 rounded-full h-1.5">
-                    <div 
+                    <div
                       className="bg-indigo-500 h-1.5 rounded-full transition-all duration-300"
                       style={{ width: `${file.progress}%` }}
                     ></div>
                   </div>
-                  <span className="text-xs text-gray-400 w-8">{file.progress}%</span>
+                  <span className="text-xs text-gray-400 w-8">
+                    {file.progress}%
+                  </span>
                 </div>
               </div>
             ))}
@@ -457,106 +529,120 @@ const DocumentsPage = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-          {filteredDocuments.map((doc) => (
-          <div key={doc.id} className="bg-gray-950/30 backdrop-blur border border-gray-800/50 rounded-2xl p-6 hover:bg-gray-950/50 hover:border-gray-700/50 transition-all duration-300 hover:shadow-lg hover:shadow-indigo-500/5 group">
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-center space-x-3">
-                <div className="p-2 bg-indigo-500/10 rounded-lg group-hover:bg-indigo-500/20 transition-colors">
-                  {getTypeIcon(doc.type)}
+          {filteredDocuments.map(doc => (
+            <div
+              key={doc.id}
+              className="bg-gray-950/30 backdrop-blur border border-gray-800/50 rounded-2xl p-6 hover:bg-gray-950/50 hover:border-gray-700/50 transition-all duration-300 hover:shadow-lg hover:shadow-indigo-500/5 group"
+            >
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 bg-indigo-500/10 rounded-lg group-hover:bg-indigo-500/20 transition-colors">
+                    {getTypeIcon(doc.type)}
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-white text-base group-hover:text-indigo-300 transition-colors">
+                      {doc.name}
+                    </h3>
+                    <p className="text-sm text-gray-400 mt-1">
+                      {doc.type} • {doc.size}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-semibold text-white text-base group-hover:text-indigo-300 transition-colors">{doc.name}</h3>
-                  <p className="text-sm text-gray-400 mt-1">{doc.type} • {doc.size}</p>
+                <div className="flex items-center">
+                  <span
+                    className={`px-2 py-1 rounded-lg text-xs font-medium border flex items-center space-x-1 ${getStatusColor(doc.status)}`}
+                  >
+                    {getStatusIcon(doc.status)}
+                    <span className="capitalize">{doc.status}</span>
+                  </span>
                 </div>
               </div>
-              <div className="flex items-center">
-                <span className={`px-2 py-1 rounded-lg text-xs font-medium border flex items-center space-x-1 ${getStatusColor(doc.status)}`}>
-                  {getStatusIcon(doc.status)}
-                  <span className="capitalize">{doc.status}</span>
+
+              <div className="text-sm text-gray-400 mb-4 flex items-center space-x-2">
+                <Clock className="h-4 w-4" />
+                <span>
+                  Uploaded on {new Date(doc.uploadDate).toLocaleDateString()}
                 </span>
               </div>
-            </div>
 
-            <div className="text-sm text-gray-400 mb-4 flex items-center space-x-2">
-              <Clock className="h-4 w-4" />
-              <span>Uploaded on {new Date(doc.uploadDate).toLocaleDateString()}</span>
-            </div>
-
-            {doc.summary && (
-              <div className="mb-4">
-                <h4 className="text-sm font-medium text-white mb-2 flex items-center">
-                  <div className="p-1 bg-purple-500/20 rounded-lg mr-2">
-                    <Sparkles className="h-4 w-4 text-purple-400" />
-                  </div>
-                  AI Summary
-                </h4>
-                <p className="text-sm text-gray-300 bg-gray-800/50 backdrop-blur p-3 rounded-lg border border-gray-700/50 leading-relaxed">
-                  {doc.summary}
-                </p>
-              </div>
-            )}
-
-            {doc.insights && doc.insights.length > 0 && (
-              <div className="mb-4">
-                <h4 className="text-sm font-medium text-white mb-2 flex items-center">
-                  <div className="p-1 bg-blue-500/20 rounded-lg mr-2">
-                    <BarChart3 className="h-4 w-4 text-blue-400" />
-                  </div>
-                  Key Insights
-                </h4>
-                <div className="space-y-2">
-                  {doc.insights.map((insight, index) => (
-                    <div key={index} className="flex items-start text-sm text-gray-300 bg-gray-800/30 p-2 rounded-lg">
-                      <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full mr-2 mt-2 flex-shrink-0"></div>
-                      <span className="leading-relaxed">{insight}</span>
+              {doc.summary && (
+                <div className="mb-4">
+                  <h4 className="text-sm font-medium text-white mb-2 flex items-center">
+                    <div className="p-1 bg-purple-500/20 rounded-lg mr-2">
+                      <Sparkles className="h-4 w-4 text-purple-400" />
                     </div>
-                  ))}
+                    AI Summary
+                  </h4>
+                  <p className="text-sm text-gray-300 bg-gray-800/50 backdrop-blur p-3 rounded-lg border border-gray-700/50 leading-relaxed">
+                    {doc.summary}
+                  </p>
+                </div>
+              )}
+
+              {doc.insights && doc.insights.length > 0 && (
+                <div className="mb-4">
+                  <h4 className="text-sm font-medium text-white mb-2 flex items-center">
+                    <div className="p-1 bg-blue-500/20 rounded-lg mr-2">
+                      <BarChart3 className="h-4 w-4 text-blue-400" />
+                    </div>
+                    Key Insights
+                  </h4>
+                  <div className="space-y-2">
+                    {doc.insights.map((insight, index) => (
+                      <div
+                        key={index}
+                        className="flex items-start text-sm text-gray-300 bg-gray-800/30 p-2 rounded-lg"
+                      >
+                        <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full mr-2 mt-2 flex-shrink-0"></div>
+                        <span className="leading-relaxed">{insight}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="flex items-center justify-between pt-4 border-t border-gray-800/50">
+                <div className="flex items-center space-x-3">
+                  <button className="flex items-center text-sm text-gray-400 hover:text-indigo-400 transition-colors">
+                    <Eye className="h-4 w-4 mr-1" />
+                    View
+                  </button>
+                  <button className="flex items-center text-sm text-gray-400 hover:text-green-400 transition-colors">
+                    <Download className="h-4 w-4 mr-1" />
+                    Download
+                  </button>
+                </div>
+                <div className="flex items-center space-x-3">
+                  {doc.status === 'analyzed' && (
+                    <button
+                      onClick={() => handleAnalyzeDocument(doc.id, doc.name)}
+                      className="flex items-center text-sm text-purple-400 hover:text-purple-300 transition-colors"
+                    >
+                      <Sparkles className="h-4 w-4 mr-1" />
+                      Re-analyze
+                    </button>
+                  )}
+                  {doc.status === 'pending' && (
+                    <button
+                      onClick={() => handleAnalyzeDocument(doc.id, doc.name)}
+                      className="flex items-center text-sm text-indigo-400 hover:text-indigo-300 transition-colors"
+                    >
+                      <Sparkles className="h-4 w-4 mr-1" />
+                      Analyze
+                    </button>
+                  )}
+                  <button
+                    onClick={() => handleDeleteDocument(doc.id, doc.name)}
+                    disabled={deletingDocuments.has(doc.id)}
+                    className="flex items-center text-sm text-red-400 hover:text-red-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <Trash2 className="h-4 w-4 mr-1" />
+                    {deletingDocuments.has(doc.id) ? 'Deleting...' : 'Delete'}
+                  </button>
                 </div>
               </div>
-            )}
-
-            <div className="flex items-center justify-between pt-4 border-t border-gray-800/50">
-              <div className="flex items-center space-x-3">
-                <button className="flex items-center text-sm text-gray-400 hover:text-indigo-400 transition-colors">
-                  <Eye className="h-4 w-4 mr-1" />
-                  View
-                </button>
-                <button className="flex items-center text-sm text-gray-400 hover:text-green-400 transition-colors">
-                  <Download className="h-4 w-4 mr-1" />
-                  Download
-                </button>
-              </div>
-              <div className="flex items-center space-x-3">
-                {doc.status === 'analyzed' && (
-                  <button 
-                    onClick={() => handleAnalyzeDocument(doc.id, doc.name)}
-                    className="flex items-center text-sm text-purple-400 hover:text-purple-300 transition-colors"
-                  >
-                    <Sparkles className="h-4 w-4 mr-1" />
-                    Re-analyze
-                  </button>
-                )}
-                {doc.status === 'pending' && (
-                  <button 
-                    onClick={() => handleAnalyzeDocument(doc.id, doc.name)}
-                    className="flex items-center text-sm text-indigo-400 hover:text-indigo-300 transition-colors"
-                  >
-                    <Sparkles className="h-4 w-4 mr-1" />
-                    Analyze
-                  </button>
-                )}
-                <button 
-                  onClick={() => handleDeleteDocument(doc.id, doc.name)}
-                  disabled={deletingDocuments.has(doc.id)}
-                  className="flex items-center text-sm text-red-400 hover:text-red-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <Trash2 className="h-4 w-4 mr-1" />
-                  {deletingDocuments.has(doc.id) ? 'Deleting...' : 'Delete'}
-                </button>
-              </div>
             </div>
-          </div>
-                  ))}
+          ))}
         </div>
       )}
 
@@ -565,12 +651,13 @@ const DocumentsPage = () => {
           <div className="p-6 bg-gray-800/30 rounded-2xl inline-block mb-6">
             <FileText className="h-16 w-16 text-gray-400 mx-auto" />
           </div>
-          <h3 className="text-2xl font-bold text-white mb-3">No documents found</h3>
+          <h3 className="text-2xl font-bold text-white mb-3">
+            No documents found
+          </h3>
           <p className="text-gray-400 text-lg max-w-md mx-auto">
-            {searchTerm || selectedFilter !== 'all' 
-              ? 'Try adjusting your search or filter criteria' 
-              : 'Upload your first document to get started with AI analysis'
-            }
+            {searchTerm || selectedFilter !== 'all'
+              ? 'Try adjusting your search or filter criteria'
+              : 'Upload your first document to get started with AI analysis'}
           </p>
         </div>
       )}
@@ -588,9 +675,12 @@ const DocumentsPage = () => {
             <div className="p-3 bg-green-500/10 rounded-xl inline-block mb-4 group-hover:bg-green-500/20 transition-colors">
               <FileText className="h-6 w-6 text-green-400" />
             </div>
-            <h3 className="font-bold text-white mb-3 text-lg">Bank Statements</h3>
+            <h3 className="font-bold text-white mb-3 text-lg">
+              Bank Statements
+            </h3>
             <p className="text-gray-400 leading-relaxed">
-              Automatically categorize transactions, identify spending patterns, and detect unusual activity.
+              Automatically categorize transactions, identify spending patterns,
+              and detect unusual activity.
             </p>
           </div>
           <div className="bg-gray-800/40 backdrop-blur border border-gray-700/50 p-6 rounded-2xl hover:bg-gray-800/60 transition-all duration-300 hover:shadow-lg group">
@@ -599,16 +689,20 @@ const DocumentsPage = () => {
             </div>
             <h3 className="font-bold text-white mb-3 text-lg">Tax Documents</h3>
             <p className="text-gray-400 leading-relaxed">
-              Extract key information, identify deduction opportunities, and plan for next year.
+              Extract key information, identify deduction opportunities, and
+              plan for next year.
             </p>
           </div>
           <div className="bg-gray-800/40 backdrop-blur border border-gray-700/50 p-6 rounded-2xl hover:bg-gray-800/60 transition-all duration-300 hover:shadow-lg group">
             <div className="p-3 bg-purple-500/10 rounded-xl inline-block mb-4 group-hover:bg-purple-500/20 transition-colors">
               <Sparkles className="h-6 w-6 text-purple-400" />
             </div>
-            <h3 className="font-bold text-white mb-3 text-lg">Investment Reports</h3>
+            <h3 className="font-bold text-white mb-3 text-lg">
+              Investment Reports
+            </h3>
             <p className="text-gray-400 leading-relaxed">
-              Analyze portfolio performance, asset allocation, and provide rebalancing recommendations.
+              Analyze portfolio performance, asset allocation, and provide
+              rebalancing recommendations.
             </p>
           </div>
         </div>
@@ -617,4 +711,4 @@ const DocumentsPage = () => {
   );
 };
 
-export default DocumentsPage; 
+export default DocumentsPage;
