@@ -1,6 +1,6 @@
 # finarro 
 
-[![Deploy Status](https://github.com/adityaramkumar/finarro/actions/workflows/deploy.yml/badge.svg)](https://github.com/adityaramkumar/finarro/actions/workflows/deploy.yml)
+[![CI/CD Pipeline](https://github.com/adityaramkumar/finarro/actions/workflows/deploy.yml/badge.svg)](https://github.com/adityaramkumar/finarro/actions/workflows/deploy.yml)
 [![Live Site](https://img.shields.io/badge/Live%20Site-finarro.com-blue)](https://finarro.com)
 [![API Status](https://img.shields.io/badge/API-api.finarro.com-green)](https://api.finarro.com/health)
 
@@ -208,14 +208,18 @@ finarro/
 
 ## 🚀 Deployment
 
-### Automated Deployment
+### Automated CI/CD Pipeline
 
-The application uses GitHub Actions for automated deployment:
+The application uses GitHub Actions for automated CI/CD:
 
 - **Trigger**: Push to `main` branch
-- **Backend**: Deploys to AWS EC2 via SSH
-- **Frontend**: Builds and deploys to AWS S3 + CloudFront
-- **Database**: Runs migrations automatically
+- **Code Quality**: ESLint checks run in parallel across frontend & backend
+- **Backend Deployment**: Deploys to AWS EC2 via SSH with zero-downtime
+- **Frontend Deployment**: Builds and deploys to AWS S3 + CloudFront
+- **Database Migrations**: Runs automatically during backend deployment
+- **Health Checks**: Verifies deployment success before completion
+
+The pipeline runs **linting in parallel** with deployment for faster feedback.
 
 ### Manual Deployment
 
