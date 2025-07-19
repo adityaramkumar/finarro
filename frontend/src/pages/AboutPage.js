@@ -52,10 +52,10 @@ const AboutPage = () => {
                   management accessible to everyone.
                 </p>
                 <p className="text-gray-300 leading-relaxed">
-                  Our team of financial experts, data scientists, and designers came together with a shared 
-                  vision: to democratize financial intelligence and help people make better financial decisions 
-                  through technology. Today, we're proud to serve thousands of users who trust us with their 
-                  financial journey.
+                  finarro was built with a clear vision: to democratize financial intelligence and help people 
+                  make better financial decisions through technology. We focus on creating tools that are both 
+                  powerful and intuitive, ensuring that advanced financial insights are accessible to everyone, 
+                  regardless of their financial background or experience.
                 </p>
               </div>
             </section>

@@ -9,6 +9,7 @@ import { AuthProvider } from './contexts/AuthContext';
 // Import layouts and components
 import MainLayout from './layouts/MainLayout';
 import PrivateRoute from './components/PrivateRoute';
+import ScrollToTop from './components/ScrollToTop';
 
 // Import pages
 import LandingPage from './pages/LandingPage';
@@ -45,6 +46,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <Router>
+          <ScrollToTop />
         <div className="App">
           <Routes>
             {/* Public routes */}
