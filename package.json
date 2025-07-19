@@ -1,0 +1,31 @@
+{
+  "name": "finarro",
+  "version": "1.0.0",
+  "description": "AI-powered financial assistant",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "lint": "npm run lint --workspace=frontend && npm run lint --workspace=backend",
+    "lint:fix": "npm run lint:fix --workspace=frontend && npm run lint:fix --workspace=backend",
+    "lint:check": "npm run lint:check --workspace=frontend && npm run lint:check --workspace=backend",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "frontend/src/**/*.{js,jsx,ts,tsx}": [
+      "eslint --fix"
+    ],
+    "backend/**/*.js": [
+      "eslint --fix"
+    ]
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^16.1.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

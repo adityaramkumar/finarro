@@ -1,0 +1,16 @@
+{
+  "short_name": "finarro",
+  "name": "finarro - AI Financial Assistant",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#4F46E5",
+  "background_color": "#1F2937",
+  "description": "Your AI-powered financial assistant. Chat with your finances, get personalized insights, and manage your money smarter."
+} 

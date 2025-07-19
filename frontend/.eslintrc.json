@@ -1,0 +1,29 @@
+{
+  "extends": [
+    "react-app",
+    "react-app/jest"
+  ],
+  "rules": {
+    "no-console": "warn",
+    "no-unused-vars": "warn",
+    "no-undef": "warn",
+    "react/jsx-no-undef": "warn",
+    "react/no-unused-state": "warn",
+    "react-hooks/exhaustive-deps": "warn",
+    "prefer-const": "warn",
+    "no-var": "warn",
+    "eqeqeq": "warn",
+    "no-eval": "error",
+    "no-implied-eval": "error",
+    "no-new-func": "error",
+    "no-script-url": "error",
+    "no-alert": "warn",
+    "no-debugger": "error",
+    "import/no-unused-modules": "off"
+  },
+  "ignorePatterns": [
+    "build/",
+    "node_modules/",
+    "*.min.js"
+  ]
+} 
