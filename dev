@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# finarro Development Launcher
+# Simple wrapper to access development tools
+
+exec scripts/dev.sh "$@" 

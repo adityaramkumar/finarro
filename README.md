@@ -62,19 +62,112 @@ The application is fully deployed and running in production:
 git clone https://github.com/adityaramkumar/finarro.git
 cd finarro
 
-# Run the automated setup script
-chmod +x setup.sh
-./setup.sh
+# Check environment and auto-fix issues
+./dev check
+./dev env fix
+
+# Start development environment
+./dev start
 ```
 
-The setup script will:
+The development tools will:
+- Validate your environment setup
 - Install all dependencies (frontend & backend)
 - Create required .env files from templates
 - Set up the PostgreSQL database
 - Run database migrations
-- Start both frontend and backend in development mode
+- Start both frontend and backend with hot reload
 
-### Manual Setup
+### Development Tools
+
+All development scripts are organized in the `scripts/` directory with a simple launcher:
+
+```bash
+# Master development tool (via launcher)
+./dev help           # Show all available commands
+./dev check          # Validate environment
+./dev start          # Start development environment
+./dev test           # Run comprehensive tests
+./dev docker         # Use Docker environment
+
+# Direct script access
+scripts/env-check.sh     # Environment validation
+scripts/local-dev.sh     # Native development
+scripts/test-local.sh    # Testing suite
+```
+
+### Development Options
+
+**Native Development**
+```bash
+./dev start  # Uses your local PostgreSQL
+```
+
+**Option 2: Testing**
+```bash
+./dev test quick  # Quick validation
+./dev test api    # API testing
+./dev test perf   # Performance testing
+```
+
+### Service URLs
+
+- **Frontend**: http://localhost:3000
+- **Backend**: http://localhost:3001
+- **Health Check**: http://localhost:3001/health
+- **Database**: localhost:5432
+
+### Troubleshooting
+
+**Common Issues:**
+
+1. **Port already in use**
+   ```bash
+   scripts/local-dev.sh clean
+   ```
+
+2. **Database connection failed**
+   ```bash
+   # Check PostgreSQL is running
+   brew services start postgresql
+   # or
+   sudo systemctl start postgresql
+   
+   # Create database
+   createdb finarro_dev
+   ```
+
+3. **Dependencies not installed**
+   ```bash
+   scripts/env-check.sh fix
+   ```
+
+4. **Environment files missing**
+   ```bash
+   scripts/local-dev.sh setup
+   ```
+
+**Health Checks:**
+```bash
+# Check environment
+./dev check
+
+# Check running services
+./dev local health
+
+# Test functionality
+./dev test quick
+```
+
+**Logs and Debugging:**
+```bash
+# Development logs
+scripts/local-dev.sh logs
+tail -f logs/backend.log
+tail -f logs/frontend.log
+```
+
+### Manual Setup (Alternative)
 
 If you prefer manual setup:
 
@@ -85,12 +178,7 @@ cd backend
 npm install
 
 # Create environment file
-cp .env.example .env
-# Edit .env with your configuration
-
-# Database setup
-npm run migrate
-npm run seed
+scripts/local-dev.sh setup
 
 # Start development server
 npm run dev
@@ -103,12 +191,93 @@ cd frontend
 npm install
 
 # Create environment file
-cp .env.example .env.development
+scripts/local-dev.sh setup
+
+# Start development server
+npm start
 # Edit .env.development with your configuration
 
 # Start development server
 npm start
 ```
+
+### Environment Configuration
+
+**Backend Environment (`.env`):**
+```bash
+# Database
+DATABASE_URL=postgres://postgres:password@localhost:5432/finarro_dev
+
+# Server
+NODE_ENV=development
+PORT=3001
+
+# Security
+JWT_SECRET=your_secure_jwt_secret_here
+JWT_REFRESH_SECRET=your_secure_refresh_secret_here
+
+# Optional: AI Features
+GEMINI_API_KEY=your_gemini_api_key_here
+
+# Optional: Financial Data
+PLAID_CLIENT_ID=your_plaid_client_id
+PLAID_SECRET=your_plaid_secret_key
+PLAID_ENV=sandbox
+
+# Optional: Payments
+STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key
+STRIPE_PRICE_ID=price_your_monthly_subscription_price_id
+STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret
+
+# Optional: Email
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USER=your_email@gmail.com
+EMAIL_PASS=your_gmail_app_password
+```
+
+**Frontend Environment (`.env.development`):**
+```bash
+# API Configuration
+REACT_APP_API_URL=http://localhost:3001/api
+
+# Optional: Payments
+REACT_APP_STRIPE_PUBLISHABLE_KEY=pk_test_your_stripe_publishable_key
+
+# Development
+NODE_ENV=development
+GENERATE_SOURCEMAP=true
+```
+
+## Testing
+
+Comprehensive testing suite for validation:
+
+```bash
+# Run all tests
+./dev test
+
+# Quick essential tests
+./dev test quick
+
+# API-only tests
+./dev test api
+
+# Environment tests
+./dev test env
+
+# Performance tests
+./dev test perf
+```
+
+**Test categories:**
+- Service availability
+- API endpoints  
+- Database connectivity
+- Authentication flow
+- CORS configuration
+- Static file serving
+- Performance metrics
 
 ### Environment Variables
 

@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useMutation } from 'react-query';
-import { Send, Bot, User, Sparkles, TrendingUp, DollarSign } from 'lucide-react';
-import { aiApi } from '../services/api';
-
+import { Send, Bot, User, Sparkles, TrendingUp, DollarSign, PieChart, Target, BarChart3, Zap } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { aiApi } from '../services/api';
+import { useAuth } from '../contexts/AuthContext';
 
 const ChatPage = () => {
   const [messages, setMessages] = useState([
