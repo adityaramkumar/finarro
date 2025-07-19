@@ -2,10 +2,12 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Heart, Target, Users, Sparkles, Shield, Globe, Zap, TrendingUp, MessageCircle } from 'lucide-react';
 import Logo from '../components/Logo';
+import SEO, { SEOConfigs } from '../components/SEO';
 
 const AboutPage = () => {
   return (
     <div className="min-h-screen bg-gray-900 px-4 sm:px-6 lg:px-8 py-8">
+      <SEO {...SEOConfigs.about} />
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">

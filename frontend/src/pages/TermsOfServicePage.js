@@ -327,9 +327,9 @@ const TermsOfServicePage = () => {
                     If you have any questions about these Terms of Service, please contact us:
                   </p>
                   <div className="text-gray-300 space-y-2">
-                    <p>📧 Email: legal@finarro.com</p>
-                    <p>📱 Phone: +1 (555) 123-4567</p>
-                    <p>📍 Address: 123 Finance Street, San Francisco, CA 94105</p>
+                    <p>📧 Email: hello@finarro.com</p>
+                    <p>📱 Phone: +1 (408) 329-7788</p>
+                    <p>📍 Address: 21135 Hazelbrook Drive, Cupertino, CA</p>
                   </div>
                 </div>
               </section>

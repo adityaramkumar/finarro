@@ -5,6 +5,7 @@ import { Eye, EyeOff, ArrowRight, Bot, ArrowLeft, AlertCircle, CheckCircle2, Loa
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'react-hot-toast';
 import Logo from '../components/Logo';
+import SEO, { SEOConfigs } from '../components/SEO';
 
 const SignupPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -118,6 +119,7 @@ const SignupPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-900 px-4 sm:px-6 lg:px-8">
+      <SEO {...SEOConfigs.signup} />
       <div className="absolute top-6 left-6">
         <Link 
           to="/" 

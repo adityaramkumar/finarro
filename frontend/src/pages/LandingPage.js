@@ -20,10 +20,12 @@ import {
   PlayCircle
 } from 'lucide-react';
 import Logo from '../components/Logo';
+import SEO, { SEOConfigs } from '../components/SEO';
 
 const LandingPage = () => {
   return (
     <div className="min-h-screen bg-gray-900">
+      <SEO {...SEOConfigs.home} />
       {/* Navigation */}
       <nav className="bg-gray-950 border-b border-gray-800 sticky top-0 z-50 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-6 py-4">

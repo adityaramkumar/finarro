@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, Mail, Phone, MapPin, Clock, Send, MessageCircle, HelpCircle, Book, Zap, Shield, CreditCard } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import Logo from '../components/Logo';
+import SEO, { SEOConfigs } from '../components/SEO';
 
 const SupportPage = () => {
   const [formData, setFormData] = useState({
@@ -99,6 +100,7 @@ const SupportPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-900 px-4 sm:px-6 lg:px-8 py-8">
+      <SEO {...SEOConfigs.support} />
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -280,7 +282,7 @@ const SupportPage = () => {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <p className="text-gray-300">📧 support@finarro.com</p>
+                    <p className="text-gray-300">📧 hello@finarro.com</p>
                     <p className="text-gray-400 text-sm">Response time: Within 24 hours</p>
                   </div>
                 </div>
@@ -296,7 +298,7 @@ const SupportPage = () => {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <p className="text-gray-300">📱 +1 (555) 123-4567</p>
+                    <p className="text-gray-300">📱 +1 (408) 329-7788</p>
                     <div className="flex items-center text-gray-400 text-sm">
                       <Clock className="h-4 w-4 mr-1" />
                       <span>Mon-Fri: 9AM-6PM PST</span>
@@ -315,8 +317,8 @@ const SupportPage = () => {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <p className="text-gray-300">📍 123 Finance Street</p>
-                    <p className="text-gray-300">San Francisco, CA 94105</p>
+                    <p className="text-gray-300">📍 21135 Hazelbrook Drive</p>
+                    <p className="text-gray-300">Cupertino, CA</p>
                     <p className="text-gray-400 text-sm">By appointment only</p>
                   </div>
                 </div>

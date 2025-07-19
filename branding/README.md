@@ -3,6 +3,8 @@
 ## 🎨 Logo Files
 
 ### Available Formats:
+- `logo-1024.svg` - Ultra high-resolution square logo (1024x1024px)
+- `logo-1024.png` - Ultra high-resolution PNG square logo (1024x1024px)
 - `logo-512.svg` - High-resolution square logo (512x512px)
 - `logo-with-text.svg` - Horizontal logo with dark text (800x200px)
 - `logo-white-text.svg` - Horizontal logo with white text (800x200px)
@@ -79,14 +81,40 @@ inkscape logo-512.svg --export-type=jpg --export-filename=logo-512.jpg
 rsvg-convert -f jpg -o logo-512.jpg logo-512.svg
 ```
 
+## 🎯 Usage Recommendations
+
+### When to Use Each Logo:
+
+- **`logo-1024.svg`** - Perfect for:
+  - Scalable web graphics and CSS
+  - Print media (infinite scalability)
+  - Design software and editing
+
+- **`logo-1024.png`** - Perfect for:
+  - App store submissions (iOS App Store, Google Play)
+  - Social media profile pictures (LinkedIn, Twitter)
+  - Website og:image and Open Graph sharing
+  - Marketing materials and presentations
+  - Email signatures and documents
+
+- **`logo-512.svg`** - Great for:
+  - Web favicons and PWA icons
+  - Medium-sized web graphics
+  - Email signatures
+
+- **Logo with text versions** - Best for:
+  - Website headers and navigation
+  - Email headers and letterheads
+  - Horizontal banner placements
+
 ## 📋 File Checklist for Account Setup
 
 Copy this checklist when setting up accounts:
 
-- [ ] **Square Logo JPG** (400x400px minimum)
-- [ ] **Horizontal Logo JPG** (800x200px minimum)  
-- [ ] **White Text Version** (for dark backgrounds)
-- [ ] **High Resolution Version** (1024x1024px for print)
+- [ ] **Square Logo JPG** (400x400px minimum) - Use `logo-1024.svg` → convert to JPG
+- [ ] **Horizontal Logo JPG** (800x200px minimum) - Use `logo-with-text.svg` → convert
+- [ ] **White Text Version** (for dark backgrounds) - Use `logo-white-text.svg`
+- [ ] **High Resolution Version** (1024x1024px for print) - ✅ **Available: `logo-1024.svg`**
 - [ ] **Favicon ICO** (converted from favicon.svg)
 
 ## 💡 Pro Tips

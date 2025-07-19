@@ -1,0 +1,28 @@
+User-agent: *
+Allow: /
+
+# Allow all search engines to crawl the site
+Allow: /signup
+Allow: /login
+Allow: /about
+Allow: /support
+Allow: /privacy
+Allow: /terms
+
+# Disallow private/admin areas
+Disallow: /dashboard
+Disallow: /chat
+Disallow: /reports
+Disallow: /documents
+Disallow: /settings
+Disallow: /api/
+Disallow: /admin/
+
+# Allow shared public charts
+Allow: /share/
+
+# Sitemap location
+Sitemap: https://finarro.com/sitemap.xml
+
+# Crawl delay (optional - be respectful)
+Crawl-delay: 1 
