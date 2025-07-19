@@ -116,8 +116,8 @@ const SettingsPage = () => {
 
   // Handle subscription cancellation
   const handleCancelSubscription = async () => {
-    // eslint-disable-next-line no-alert
     if (
+      // eslint-disable-next-line no-alert
       !window.confirm(
         'Are you sure you want to cancel your subscription? You will retain access until the end of your current billing period.'
       )

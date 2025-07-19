@@ -1,7 +1,15 @@
 #!/bin/sh
 
-# Run formatting and linting for frontend
-cd frontend && npm run format:lint
+# Run the same checks as CI/CD to catch issues early
 
-# Run formatting and linting for backend  
-cd ../backend && npm run format:lint
+# Frontend checks
+cd frontend
+npm run format:check || { echo "❌ Frontend formatting issues found. Run 'npm run format' to fix."; exit 1; }
+npm run lint:check || { echo "❌ Frontend linting issues found. Run 'npm run lint:fix' to fix."; exit 1; }
+npm test -- --watchAll=false || { echo "❌ Frontend tests failed."; exit 1; }
+
+# Backend checks  
+cd ../backend
+npm run format:check || { echo "❌ Backend formatting issues found. Run 'npm run format' to fix."; exit 1; }
+npm run lint:check || { echo "❌ Backend linting issues found. Run 'npm run lint:fix' to fix."; exit 1; }
+npm test || { echo "❌ Backend tests failed."; exit 1; }

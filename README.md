@@ -1,6 +1,7 @@
 # finarro 
 
 [![CI/CD Pipeline](https://github.com/adityaramkumar/finarro/actions/workflows/deploy.yml/badge.svg)](https://github.com/adityaramkumar/finarro/actions/workflows/deploy.yml)
+[![Code Quality](https://github.com/adityaramkumar/finarro/actions/workflows/code-quality.yml/badge.svg)](https://github.com/adityaramkumar/finarro/actions/workflows/code-quality.yml)
 [![Live Site](https://img.shields.io/badge/Live%20Site-finarro.com-blue)](https://finarro.com)
 [![API Status](https://img.shields.io/badge/API-api.finarro.com-green)](https://api.finarro.com/health)
 
