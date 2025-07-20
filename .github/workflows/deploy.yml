@@ -66,16 +66,18 @@ jobs:
       - name: Install dependencies
         run: |
           cd frontend
-          # Clear any existing caches
+          # Aggressive cache clearing
           npm cache clean --force
-          npm ci
+          rm -rf node_modules/ package-lock.json build/ .cache/ 
+          npm install
           
       - name: Build application
         run: |
           cd frontend
-          # Clear React build cache
-          rm -rf build/ node_modules/.cache/
-          npm run build
+          # Clear all possible caches
+          rm -rf build/ node_modules/.cache/ .eslintcache
+          # Force fresh build with no caching
+          CI=false npm run build
         env:
           REACT_APP_API_URL: https://api.finarro.com/api
           REACT_APP_STRIPE_PUBLISHABLE_KEY: ${{ secrets.STRIPE_PUBLISHABLE_KEY }}
