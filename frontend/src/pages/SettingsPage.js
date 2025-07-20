@@ -84,6 +84,7 @@ const SettingsPage = () => {
 
       setLinkedAccounts(transformedAccounts);
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Failed to load linked accounts:', error);
       setLinkedAccounts([]);
     }
@@ -104,6 +105,7 @@ const SettingsPage = () => {
   // Handle account removal
   const handleRemoveAccount = async (accountId, accountName) => {
     if (
+      // eslint-disable-next-line no-alert
       !window.confirm(
         `Are you sure you want to disconnect "${accountName}"? This will remove all associated data.`
       )
@@ -120,9 +122,8 @@ const SettingsPage = () => {
         prev.filter(account => account.id !== accountId)
       );
       toast.success('Account disconnected successfully');
-
-      console.log('Account removed successfully:', accountId);
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Error removing account:', error);
       toast.error('Failed to disconnect account. Please try again.');
     }

@@ -60,7 +60,6 @@ const ReportsPage = () => {
   const data = dashboardData?.data || {};
   const summary = data.summary || {};
   const accounts = data.accounts || [];
-  const transactions = data.transactions || [];
   const spendingByCategory = data.spending_by_category || [];
   const netWorthData = data.net_worth_data || [];
 
