@@ -16,7 +16,12 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'react-hot-toast';
-import { subscriptionApi, userApi } from '../services/api';
+import {
+  subscriptionApi,
+  userApi,
+  dashboardApi,
+  accountsApi,
+} from '../services/api';
 import SubscriptionUpgrade from '../components/SubscriptionUpgrade';
 import PlaidLink from '../components/PlaidLink';
 
@@ -58,17 +63,73 @@ const SettingsPage = () => {
   const [linkedAccounts, setLinkedAccounts] = useState([]);
 
   // Load linked accounts from API
-  useEffect(() => {
-    const loadLinkedAccounts = async () => {
-      try {
-        // Note: This would be an API call to get user's connected accounts
-        // For now, we'll show empty state since no real Plaid accounts are connected
-        setLinkedAccounts([]);
-      } catch (error) {
-        setLinkedAccounts([]);
-      }
-    };
+  const loadLinkedAccounts = async () => {
+    try {
+      // Fetch dashboard data to get connected accounts
+      const response = await dashboardApi.getDashboardData({
+        timeframe: '30d',
+      });
+      const accounts = response.data?.accounts || [];
 
+      // Transform accounts to match Settings page format
+      const transformedAccounts = accounts.map(account => ({
+        id: account.id,
+        name: account.name,
+        type: account.type,
+        last4: account.mask || '••••',
+        connected: true,
+        institution: account.institution_name,
+        balance: account.balance,
+      }));
+
+      setLinkedAccounts(transformedAccounts);
+    } catch (error) {
+      console.error('Failed to load linked accounts:', error);
+      setLinkedAccounts([]);
+    }
+  };
+
+  // Handle successful Plaid connection
+  const handlePlaidSuccess = () => {
+    // Reload linked accounts
+    loadLinkedAccounts();
+    toast.success('Account connected successfully!');
+  };
+
+  // Handle Plaid connection error
+  const handlePlaidError = error => {
+    toast.error('Failed to connect account. Please try again.');
+  };
+
+  // Handle account removal
+  const handleRemoveAccount = async (accountId, accountName) => {
+    if (
+      !window.confirm(
+        `Are you sure you want to disconnect "${accountName}"? This will remove all associated data.`
+      )
+    ) {
+      return;
+    }
+
+    try {
+      // Call API to remove Plaid account
+      await accountsApi.removePlaidAccount(accountId);
+
+      // Remove from local state on successful API call
+      setLinkedAccounts(prev =>
+        prev.filter(account => account.id !== accountId)
+      );
+      toast.success('Account disconnected successfully');
+
+      console.log('Account removed successfully:', accountId);
+    } catch (error) {
+      console.error('Error removing account:', error);
+      toast.error('Failed to disconnect account. Please try again.');
+    }
+  };
+
+  // Load linked accounts on component mount
+  useEffect(() => {
     loadLinkedAccounts();
   }, []);
 
@@ -643,48 +704,75 @@ const SettingsPage = () => {
                 Linked Accounts
               </h2>
               <div className="space-y-4">
-                {linkedAccounts.map(account => (
-                  <div
-                    key={account.id}
-                    className="bg-gray-800/40 backdrop-blur border border-gray-700/50 p-6 rounded-2xl hover:bg-gray-800/60 transition-all duration-300 hover:shadow-lg group"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-4">
-                        <div className="p-3 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-xl group-hover:from-purple-500/30 group-hover:to-pink-500/30 transition-colors">
-                          <CreditCard className="h-6 w-6 text-purple-400" />
-                        </div>
-                        <div>
-                          <p className="font-bold text-white text-lg">
-                            {account.name}
-                          </p>
-                          <p className="text-sm text-gray-400">
-                            {account.type} •••• {account.last4}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-4">
-                        {account.connected ? (
-                          <div className="flex items-center space-x-2 bg-green-500/10 border border-green-500/20 rounded-xl px-4 py-2">
-                            <CheckCircle className="h-4 w-4 text-green-400" />
-                            <span className="text-green-400 text-sm font-medium">
-                              Connected
-                            </span>
+                {linkedAccounts.length === 0 ? (
+                  <div className="text-center py-8">
+                    <div className="p-4 bg-gray-800/30 rounded-full inline-block mb-4">
+                      <Link className="h-12 w-12 text-gray-500" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-white mb-2">
+                      No Linked Accounts
+                    </h3>
+                    <p className="text-gray-400 max-w-md mx-auto mb-6">
+                      Connect your bank accounts to start tracking your finances
+                      and get personalized insights.
+                    </p>
+                  </div>
+                ) : (
+                  linkedAccounts.map(account => (
+                    <div
+                      key={account.id}
+                      className="bg-gray-800/40 backdrop-blur border border-gray-700/50 p-6 rounded-2xl hover:bg-gray-800/60 transition-all duration-300 hover:shadow-lg group"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-4">
+                          <div className="p-3 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-xl group-hover:from-purple-500/30 group-hover:to-pink-500/30 transition-colors">
+                            <CreditCard className="h-6 w-6 text-purple-400" />
                           </div>
-                        ) : (
-                          <button className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-6 py-2 rounded-xl text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-indigo-500/25 hover:scale-105 active:scale-95">
-                            Connect
+                          <div>
+                            <p className="font-bold text-white text-lg">
+                              {account.institution} - {account.name}
+                            </p>
+                            <p className="text-sm text-gray-400">
+                              {account.type} •••• {account.last4}
+                            </p>
+                            <p className="text-xs text-green-400 mt-1">
+                              {new Intl.NumberFormat('en-US', {
+                                style: 'currency',
+                                currency: 'USD',
+                              }).format(account.balance || 0)}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-4">
+                          {account.connected ? (
+                            <div className="flex items-center space-x-2 bg-green-500/10 border border-green-500/20 rounded-xl px-4 py-2">
+                              <CheckCircle className="h-4 w-4 text-green-400" />
+                              <span className="text-green-400 text-sm font-medium">
+                                Connected
+                              </span>
+                            </div>
+                          ) : (
+                            <button className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-6 py-2 rounded-xl text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-indigo-500/25 hover:scale-105 active:scale-95">
+                              Connect
+                            </button>
+                          )}
+                          <button
+                            onClick={() =>
+                              handleRemoveAccount(account.id, account.name)
+                            }
+                            className="text-red-400 hover:text-red-300 p-2 rounded-xl hover:bg-red-500/10 transition-colors"
+                            title="Disconnect account"
+                          >
+                            <Trash2 className="h-5 w-5" />
                           </button>
-                        )}
-                        <button className="text-red-400 hover:text-red-300 p-2 rounded-xl hover:bg-red-500/10 transition-colors">
-                          <Trash2 className="h-5 w-5" />
-                        </button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                )}
                 <PlaidLink
-                  onSuccess={() => window.location.reload()}
-                  onError={() => {}}
+                  onSuccess={handlePlaidSuccess}
+                  onError={handlePlaidError}
                 >
                   <button className="w-full border-2 border-dashed border-gray-600/50 hover:border-gray-500/50 rounded-2xl p-8 text-center text-gray-400 hover:text-white transition-all duration-300 hover:bg-gray-800/20 group">
                     <div className="p-4 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-2xl inline-block mb-4 group-hover:from-indigo-500/30 group-hover:to-purple-500/30 transition-colors">

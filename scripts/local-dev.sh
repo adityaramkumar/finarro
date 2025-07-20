@@ -113,8 +113,8 @@ JWT_REFRESH_SECRET=your_refresh_secret_here_64_character_string_change_this_too
 GEMINI_API_KEY=your_gemini_api_key_here
 
 # Plaid Configuration (Optional for financial data)
-PLAID_CLIENT_ID=your_plaid_client_id
-PLAID_SECRET=your_plaid_secret_key
+PLAID_CLIENT_ID=plaid_client_id_here_get_from_plaid_dashboard
+PLAID_SECRET=plaid_secret_key_here_get_from_plaid_dashboard
 PLAID_ENV=sandbox
 
 # Stripe Configuration (Optional for payments)

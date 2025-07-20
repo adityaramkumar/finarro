@@ -149,7 +149,7 @@ check_environment_files() {
             log_warning "⚠ Gemini API key not configured (AI features will be limited)"
         fi
         
-        if grep -q "PLAID_CLIENT_ID" backend/.env && [ "$(grep "PLAID_CLIENT_ID" backend/.env | cut -d'=' -f2)" != "your_plaid_client_id" ]; then
+        if grep -q "PLAID_CLIENT_ID" backend/.env && [ "$(grep "PLAID_CLIENT_ID" backend/.env | cut -d'=' -f2)" != "plaid_client_id_here_get_from_plaid_dashboard" ]; then
             log_success "✓ Plaid credentials are configured"
         else
             log_warning "⚠ Plaid credentials not configured (financial data features will be limited)"

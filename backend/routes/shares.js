@@ -66,71 +66,13 @@ const generateNetWorthDataForTimeframes = async userId => {
 
       const currentNetWorth = totalAssets - totalLiabilities;
 
-      // Generate data points based on timeframe
-      let dataPoints;
-      switch (timeframe) {
-        case '7d':
-          dataPoints = 7;
-          break;
-        case '30d':
-          dataPoints = 6; // Show 6 points over 30 days
-          break;
-        case '90d':
-          dataPoints = 6; // Show 6 points over 90 days
-          break;
-        case '1y':
-          dataPoints = 12; // Show 12 months
-          break;
-        default:
-          dataPoints = 6;
-      }
-
-      for (let i = dataPoints - 1; i >= 0; i--) {
-        const pointDate = new Date();
-
-        if (timeframe === '7d') {
-          pointDate.setDate(pointDate.getDate() - i);
-        } else if (timeframe === '30d') {
-          pointDate.setDate(pointDate.getDate() - i * 5); // Every 5 days
-        } else if (timeframe === '90d') {
-          pointDate.setDate(pointDate.getDate() - i * 15); // Every 15 days
-        } else if (timeframe === '1y') {
-          pointDate.setMonth(pointDate.getMonth() - i);
-        }
-
-        // Simulate gradual net worth growth over time
-        const growthFactor = 1 + (Math.random() * 0.02 + 0.01) * i; // 1-3% growth per period
-        const historicalNetWorth = Math.max(
-          currentNetWorth / growthFactor,
-          1000
-        );
-        const historicalAssets = Math.max(totalAssets / growthFactor, 1000);
-        const historicalLiabilities =
-          totalLiabilities / Math.max(growthFactor * 0.8, 1);
-
-        let nameFormat;
-        if (timeframe === '7d') {
-          nameFormat = pointDate.toLocaleDateString('en-US', {
-            weekday: 'short',
-          });
-        } else if (timeframe === '1y') {
-          nameFormat = pointDate.toLocaleDateString('en-US', {
-            month: 'short',
-          });
-        } else {
-          nameFormat = pointDate.toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-          });
-        }
-
-        netWorthData.push({
-          name: nameFormat,
-          netWorth: Math.round(historicalNetWorth),
-          assets: Math.round(historicalAssets),
-          liabilities: Math.round(historicalLiabilities),
-        });
-      }
+      // Only show current net worth data point - no synthetic historical data
+      netWorthData.push({
+        name: new Date().toLocaleDateString('en-US', { month: 'short' }),
+        netWorth: Math.round(currentNetWorth),
+        assets: Math.round(totalAssets),
+        liabilities: Math.round(totalLiabilities),
+      });
     }
 
     allData[timeframe] = netWorthData;

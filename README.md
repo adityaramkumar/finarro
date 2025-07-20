@@ -179,8 +179,8 @@ JWT_SECRET=your_secure_64_character_jwt_secret_here
 JWT_REFRESH_SECRET=your_secure_64_character_refresh_secret_here
 
 # Plaid (Bank Integration)
-PLAID_CLIENT_ID=your_plaid_client_id
-PLAID_SECRET=your_plaid_secret_key
+PLAID_CLIENT_ID=plaid_client_id_here_get_from_plaid_dashboard
+PLAID_SECRET=plaid_secret_key_here_get_from_plaid_dashboard
 PLAID_ENV=sandbox
 
 # Stripe (Payments)

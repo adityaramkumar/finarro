@@ -72,6 +72,7 @@ export const accountsApi = {
   getAccounts: () => api.get('/accounts'),
   syncAccounts: () => api.post('/accounts/sync'),
   deleteAccount: accountId => api.delete(`/accounts/${accountId}`),
+  removePlaidAccount: accountId => api.delete(`/plaid/accounts/${accountId}`),
 };
 
 // Transactions API

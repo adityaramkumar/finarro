@@ -45,7 +45,7 @@ router.post('/link/token/exchange', auth, async (req, res) => {
   try {
     const { public_token } = req.body;
 
-    const response = await client.linkTokenExchange({
+    const response = await client.itemPublicTokenExchange({
       public_token,
     });
 
@@ -57,17 +57,42 @@ router.post('/link/token/exchange', auth, async (req, res) => {
       access_token: accessToken,
     });
 
+    // Get institution info for database
+    const institutionResponse = await client.institutionsGetById({
+      institution_id: accountsResponse.data.item.institution_id,
+      country_codes: ['US'],
+    });
+    const institution = institutionResponse.data.institution;
+
+    // Store item in database first
+    await db('items')
+      .insert({
+        user_id: req.user.id,
+        plaid_item_id: itemId,
+        plaid_access_token: accessToken,
+        institution_id: institution.institution_id,
+        institution_name: institution.name,
+        created_at: new Date(),
+        updated_at: new Date(),
+      })
+      .onConflict('plaid_item_id')
+      .merge();
+
     // Store accounts in database
     for (const account of accountsResponse.data.accounts) {
       await db('accounts').insert({
         user_id: req.user.id,
         plaid_account_id: account.account_id,
         plaid_item_id: itemId,
-        plaid_access_token: accessToken,
-        name: account.name,
-        type: account.type,
-        subtype: account.subtype,
-        balance: account.balances.current || 0,
+        institution_id: institution.institution_id,
+        institution_name: institution.name,
+        account_name: account.name,
+        account_type: account.type,
+        account_subtype: account.subtype,
+        mask: account.mask,
+        current_balance: account.balances.current || 0,
+        available_balance:
+          account.balances.available || account.balances.current || 0,
         currency: account.balances.iso_currency_code || 'USD',
         created_at: new Date(),
         updated_at: new Date(),
@@ -80,7 +105,11 @@ router.post('/link/token/exchange', auth, async (req, res) => {
     });
   } catch (error) {
     logger.error('Error exchanging token:', error);
-    res.status(500).json({ error: 'Server error' });
+    logger.error('Error details:', error.message);
+    if (error.response) {
+      logger.error('Error response:', error.response.data);
+    }
+    res.status(500).json({ error: 'Server error', details: error.message });
   }
 });
 

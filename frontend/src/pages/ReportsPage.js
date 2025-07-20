@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useQuery } from 'react-query';
 import {
   LineChart,
   Line,
@@ -18,20 +19,71 @@ import {
   Target,
   Sparkles,
 } from 'lucide-react';
+import { dashboardApi } from '../services/api';
+import { toast } from 'react-hot-toast';
+import PlaidLink from '../components/PlaidLink';
 
 const ReportsPage = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('6months');
   const [selectedReport, setSelectedReport] = useState('overview');
 
-  // Empty report data structure - will be populated by API calls
-  const reportData = {
-    netWorth: [],
-    cashFlow: [],
-    categoryTrends: [],
-    savingsGoals: [],
+  // Map period to timeframe for API
+  const getTimeframe = period => {
+    switch (period) {
+      case '3months':
+        return '90d';
+      case '6months':
+        return '180d';
+      case '1year':
+        return '1y';
+      case '2years':
+        return '2y';
+      default:
+        return '180d';
+    }
   };
 
-  // Empty AI insights - will be populated by API calls
+  // Fetch dashboard data from API (same as Dashboard page)
+  const { data: dashboardData, isLoading } = useQuery(
+    ['dashboard', getTimeframe(selectedPeriod)],
+    () =>
+      dashboardApi.getDashboardData({
+        timeframe: getTimeframe(selectedPeriod),
+      }),
+    {
+      onError: error => {
+        toast.error('Failed to load reports data');
+      },
+    }
+  );
+
+  const data = dashboardData?.data || {};
+  const summary = data.summary || {};
+  const accounts = data.accounts || [];
+  const transactions = data.transactions || [];
+  const spendingByCategory = data.spending_by_category || [];
+  const netWorthData = data.net_worth_data || [];
+
+  // Report data structure populated from API
+  const reportData = {
+    netWorth: netWorthData,
+    cashFlow: [], // TODO: Add cash flow calculation
+    categoryTrends: spendingByCategory,
+    savingsGoals: [], // TODO: Add savings goals
+  };
+
+  // Handle successful Plaid connection
+  const handlePlaidSuccess = () => {
+    // Refetch reports data to show new accounts
+    window.location.reload();
+  };
+
+  // Handle Plaid connection error
+  const handlePlaidError = error => {
+    // Error handling - could show toast notification if needed
+  };
+
+  // Empty AI insights - will be populated by API calls later
   const aiInsights = [];
 
   const getInsightColor = type => {
@@ -46,6 +98,28 @@ const ReportsPage = () => {
         return 'text-gray-400 bg-gray-400/10 border-gray-400/20';
     }
   };
+
+  // Helper function for currency formatting
+  const formatCurrency = amount => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount);
+  };
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-96">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500 mx-auto mb-4"></div>
+          <p className="text-gray-400">Loading your financial reports...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8 animate-fade-in">
@@ -175,9 +249,14 @@ const ReportsPage = () => {
               your accounts and add transaction data.
             </p>
             <div className="mt-6">
-              <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
-                Connect Account
-              </button>
+              <PlaidLink
+                onSuccess={handlePlaidSuccess}
+                onError={handlePlaidError}
+              >
+                <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+                  Connect Account
+                </button>
+              </PlaidLink>
             </div>
           </div>
         </div>
@@ -229,9 +308,14 @@ const ReportsPage = () => {
                     time.
                   </p>
                   <div className="mt-6">
-                    <button className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors">
-                      Connect Account
-                    </button>
+                    <PlaidLink
+                      onSuccess={handlePlaidSuccess}
+                      onError={handlePlaidError}
+                    >
+                      <button className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors">
+                        Connect Account
+                      </button>
+                    </PlaidLink>
                   </div>
                 </div>
               ) : (
@@ -460,14 +544,18 @@ const ReportsPage = () => {
               <p className="text-sm text-gray-400 mb-2 group-hover:text-gray-300 transition-colors">
                 Average Monthly Income
               </p>
-              <p className="text-2xl font-bold text-white">$0</p>
+              <p className="text-2xl font-bold text-white">
+                {formatCurrency(summary.total_income || 0)}
+              </p>
             </div>
             <div className="p-3 bg-green-500/10 rounded-2xl group-hover:bg-green-500/20 transition-colors group-hover:scale-110 duration-300">
               <TrendingUp className="h-6 w-6 text-green-400" />
             </div>
           </div>
           <div className="flex items-center space-x-1 text-sm font-medium text-gray-400 mt-3">
-            <span>No data available</span>
+            <span>
+              {accounts.length > 0 ? 'Last 30 days' : 'No data available'}
+            </span>
           </div>
         </div>
 
@@ -477,14 +565,18 @@ const ReportsPage = () => {
               <p className="text-sm text-gray-400 mb-2 group-hover:text-gray-300 transition-colors">
                 Average Monthly Expenses
               </p>
-              <p className="text-2xl font-bold text-white">$0</p>
+              <p className="text-2xl font-bold text-white">
+                {formatCurrency(summary.total_expenses || 0)}
+              </p>
             </div>
             <div className="p-3 bg-red-500/10 rounded-2xl group-hover:bg-red-500/20 transition-colors group-hover:scale-110 duration-300">
               <TrendingDown className="h-6 w-6 text-red-400" />
             </div>
           </div>
           <div className="flex items-center space-x-1 text-sm font-medium text-gray-400 mt-3">
-            <span>No data available</span>
+            <span>
+              {accounts.length > 0 ? 'Last 30 days' : 'No data available'}
+            </span>
           </div>
         </div>
 
@@ -494,14 +586,20 @@ const ReportsPage = () => {
               <p className="text-sm text-gray-400 mb-2 group-hover:text-gray-300 transition-colors">
                 Monthly Savings Rate
               </p>
-              <p className="text-2xl font-bold text-white">0%</p>
+              <p className="text-2xl font-bold text-white">
+                {summary.total_income && summary.total_income > 0
+                  ? `${(((summary.total_income - summary.total_expenses) / summary.total_income) * 100).toFixed(1)}%`
+                  : '0%'}
+              </p>
             </div>
             <div className="p-3 bg-purple-500/10 rounded-2xl group-hover:bg-purple-500/20 transition-colors group-hover:scale-110 duration-300">
               <Target className="h-6 w-6 text-purple-400" />
             </div>
           </div>
           <div className="flex items-center space-x-1 text-sm font-medium text-gray-400 mt-3">
-            <span>No data available</span>
+            <span>
+              {accounts.length > 0 ? 'Last 30 days' : 'No data available'}
+            </span>
           </div>
         </div>
 
@@ -511,14 +609,20 @@ const ReportsPage = () => {
               <p className="text-sm text-gray-400 mb-2 group-hover:text-gray-300 transition-colors">
                 Net Worth Growth
               </p>
-              <p className="text-2xl font-bold text-white">0%</p>
+              <p className="text-2xl font-bold text-white">
+                {netWorthData.length >= 2
+                  ? `${(((netWorthData[netWorthData.length - 1].netWorth - netWorthData[0].netWorth) / Math.abs(netWorthData[0].netWorth || 1)) * 100).toFixed(1)}%`
+                  : '0%'}
+              </p>
             </div>
             <div className="p-3 bg-blue-500/10 rounded-2xl group-hover:bg-blue-500/20 transition-colors group-hover:scale-110 duration-300">
               <DollarSign className="h-6 w-6 text-blue-400" />
             </div>
           </div>
           <div className="flex items-center space-x-1 text-sm font-medium text-gray-400 mt-3">
-            <span>No data available</span>
+            <span>
+              {accounts.length > 0 ? 'Period growth' : 'No data available'}
+            </span>
           </div>
         </div>
       </div>

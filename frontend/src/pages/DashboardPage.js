@@ -422,9 +422,14 @@ const DashboardPage = () => {
                 worth trends and financial growth over time.
               </p>
               <div className="mt-6 flex space-x-4">
-                <button className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors">
-                  Connect Account
-                </button>
+                <PlaidLink
+                  onSuccess={handlePlaidSuccess}
+                  onError={handlePlaidError}
+                >
+                  <button className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors">
+                    Connect Account
+                  </button>
+                </PlaidLink>
                 <button className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors">
                   Add Transaction
                 </button>
@@ -851,75 +856,25 @@ const DashboardPage = () => {
             </button>
           </div>
           {!hasData ? (
-            <div className="space-y-3">
-              {/* Placeholder transactions */}
-              {[
-                {
-                  name: 'Salary deposit will appear here',
-                  amount: '+$0.00',
-                  category: 'Income',
-                  icon: '💰',
-                },
-                {
-                  name: 'Your purchases will show here',
-                  amount: '-$0.00',
-                  category: 'Shopping',
-                  icon: '🛍️',
-                },
-                {
-                  name: 'Coffee and dining expenses',
-                  amount: '-$0.00',
-                  category: 'Food',
-                  icon: '☕',
-                },
-                {
-                  name: 'Monthly subscriptions',
-                  amount: '-$0.00',
-                  category: 'Services',
-                  icon: '📱',
-                },
-                {
-                  name: 'Investment contributions',
-                  amount: '-$0.00',
-                  category: 'Investment',
-                  icon: '📈',
-                },
-              ].map((placeholder, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between p-4 bg-gray-800/10 rounded-xl border border-gray-700/20 opacity-50"
-                >
-                  <div className="flex items-center space-x-4">
-                    <div className="h-12 w-12 bg-gray-700/20 rounded-xl flex items-center justify-center">
-                      <span className="text-lg">{placeholder.icon}</span>
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-400 text-sm">
-                        {placeholder.name}
-                      </p>
-                      <p className="text-xs text-gray-500 mt-1">
-                        {placeholder.category}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-semibold text-gray-500 text-sm">
-                      {placeholder.amount}
-                    </p>
-                    <p className="text-xs text-gray-600">Pending connection</p>
-                  </div>
-                </div>
-              ))}
-              <div className="text-center pt-4">
-                <PlaidLink
-                  onSuccess={handlePlaidSuccess}
-                  onError={handlePlaidError}
-                >
-                  <button className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl transition-all duration-200 shadow-lg hover:shadow-indigo-500/25 font-medium">
-                    Connect Account to See Real Transactions
-                  </button>
-                </PlaidLink>
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <div className="p-4 bg-gray-800/30 rounded-full mb-6">
+                <CreditCard className="h-12 w-12 text-gray-500" />
               </div>
+              <h3 className="text-lg font-semibold text-white mb-2">
+                No Transactions Yet
+              </h3>
+              <p className="text-gray-400 max-w-md mb-6">
+                Connect your bank accounts to see your transactions and get
+                insights into your spending patterns.
+              </p>
+              <PlaidLink
+                onSuccess={handlePlaidSuccess}
+                onError={handlePlaidError}
+              >
+                <button className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl transition-all duration-200 shadow-lg hover:shadow-indigo-500/25 font-medium">
+                  Connect Bank Account
+                </button>
+              </PlaidLink>
             </div>
           ) : (
             <div className="space-y-4">

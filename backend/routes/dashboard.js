@@ -222,7 +222,7 @@ router.get('/', auth, async (req, res) => {
       expense: parseFloat(month.expense) || 0,
     }));
 
-    // Get net worth data - generate realistic progression over time
+    // Get net worth data - only use real data, no synthetic generation
     const netWorthData = [];
 
     if (accounts.length > 0) {
@@ -241,28 +241,13 @@ router.get('/', auth, async (req, res) => {
 
       const currentNetWorth = totalAssets - totalLiabilities;
 
-      // Generate 6 months of historical data with realistic growth
-      for (let i = 5; i >= 0; i--) {
-        const monthDate = new Date();
-        monthDate.setMonth(monthDate.getMonth() - i);
-
-        // Simulate gradual net worth growth over time (2-5% monthly growth with some variation)
-        const growthFactor = 1 + (Math.random() * 0.03 + 0.02) * i; // 2-5% cumulative growth
-        const historicalNetWorth = Math.max(
-          currentNetWorth / growthFactor,
-          1000
-        );
-        const historicalAssets = Math.max(totalAssets / growthFactor, 1000);
-        const historicalLiabilities =
-          totalLiabilities / Math.max(growthFactor * 0.8, 1); // Liabilities grow slower
-
-        netWorthData.push({
-          name: monthDate.toLocaleDateString('en-US', { month: 'short' }),
-          netWorth: Math.round(historicalNetWorth),
-          assets: Math.round(historicalAssets),
-          liabilities: Math.round(historicalLiabilities),
-        });
-      }
+      // Only show current net worth data point
+      netWorthData.push({
+        name: new Date().toLocaleDateString('en-US', { month: 'short' }),
+        netWorth: Math.round(currentNetWorth),
+        assets: Math.round(totalAssets),
+        liabilities: Math.round(totalLiabilities),
+      });
     }
 
     // Calculate investment returns (simplified - in production you'd have actual investment data)
