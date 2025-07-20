@@ -31,6 +31,11 @@ jobs:
             # Update FRONTEND_URL for production
             sed -i 's|FRONTEND_URL=.*|FRONTEND_URL=https://finarro.com|' .env
             
+            # Set Plaid environment variables for production
+            sed -i 's|PLAID_CLIENT_ID=.*|PLAID_CLIENT_ID=${{ secrets.PLAID_CLIENT_ID }}|' .env
+            sed -i 's|PLAID_SECRET=.*|PLAID_SECRET=${{ secrets.PLAID_SECRET }}|' .env
+            sed -i 's|PLAID_ENV=.*|PLAID_ENV=${{ secrets.PLAID_ENV }}|' .env
+            
             # Run database migrations
             npx knex migrate:latest --env production
             

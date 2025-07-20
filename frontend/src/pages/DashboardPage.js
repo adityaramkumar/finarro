@@ -757,56 +757,25 @@ const DashboardPage = () => {
             </button>
           </div>
           {!hasData ? (
-            <div className="space-y-4">
-              {/* Placeholder accounts */}
-              {[
-                {
-                  name: 'Connect your checking account',
-                  type: 'checking',
-                  icon: '🏦',
-                },
-                {
-                  name: 'Connect your savings account',
-                  type: 'savings',
-                  icon: '🏛️',
-                },
-                {
-                  name: 'Connect your credit card',
-                  type: 'credit',
-                  icon: '💳',
-                },
-              ].map((placeholder, index) => (
-                <div
-                  key={index}
-                  className="group flex items-center justify-between p-5 bg-gray-800/10 rounded-xl border-2 border-dashed border-gray-700/30 hover:border-indigo-500/30 transition-all duration-300"
-                >
-                  <div className="flex items-center space-x-4">
-                    <div className="h-14 w-14 bg-gradient-to-br from-gray-600/20 to-gray-700/20 rounded-xl flex items-center justify-center">
-                      <span className="text-2xl opacity-50">
-                        {placeholder.icon}
-                      </span>
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="font-semibold text-gray-400 truncate text-base">
-                        {placeholder.name}
-                      </p>
-                      <p className="text-sm text-gray-500 capitalize mt-1">
-                        {placeholder.type} account
-                      </p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <PlaidLink
-                      onSuccess={handlePlaidSuccess}
-                      onError={handlePlaidError}
-                    >
-                      <button className="px-4 py-2 bg-indigo-600/80 hover:bg-indigo-600 text-white rounded-lg transition-colors text-sm">
-                        Connect
-                      </button>
-                    </PlaidLink>
-                  </div>
-                </div>
-              ))}
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <div className="p-4 bg-gray-800/30 rounded-full mb-6">
+                <CreditCard className="h-12 w-12 text-gray-500" />
+              </div>
+              <h3 className="text-lg font-semibold text-white mb-2">
+                No Accounts Connected
+              </h3>
+              <p className="text-gray-400 max-w-md mb-6">
+                Connect your bank accounts to see your financial overview and
+                track your spending.
+              </p>
+              <PlaidLink
+                onSuccess={handlePlaidSuccess}
+                onError={handlePlaidError}
+              >
+                <button className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl transition-all duration-200 shadow-lg hover:shadow-indigo-500/25 font-medium">
+                  Connect Your First Account
+                </button>
+              </PlaidLink>
             </div>
           ) : (
             <div className="space-y-4">

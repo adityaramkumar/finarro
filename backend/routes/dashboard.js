@@ -250,16 +250,19 @@ router.get('/', auth, async (req, res) => {
       });
     }
 
-    // Calculate investment returns (simplified - in production you'd have actual investment data)
-    const investmentReturns =
-      investmentAccounts.length > 0
-        ? (investmentAccounts.reduce(
-            (sum, acc) => sum + parseFloat(acc.current_balance || 0),
-            0
-          ) *
-            0.08) /
-          12 // 8% annual return
-        : 0;
+    // Calculate actual investment returns from transaction data
+    let investmentReturns = 0;
+    if (investmentAccounts.length > 0) {
+      const investmentAccountIds = investmentAccounts.map(acc => acc.id);
+      const investmentTransactions = await db('transactions')
+        .whereIn('account_id', investmentAccountIds)
+        .where('date', '>=', dateFilter)
+        .where('amount', '>', 0) // Only gains/dividends
+        .sum('amount as total_returns')
+        .first();
+
+      investmentReturns = parseFloat(investmentTransactions.total_returns) || 0;
+    }
 
     // Format final response
     const dashboardData = {

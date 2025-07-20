@@ -86,23 +86,8 @@ const ChatPage = () => {
     setInputMessage('');
     setIsTyping(true);
 
-    // For demo purposes, we'll simulate AI responses
-    setTimeout(() => {
-      const aiResponse = generateAIResponse(message);
-      setMessages(prev => [
-        ...prev,
-        {
-          id: Date.now() + 1,
-          role: 'assistant',
-          content: aiResponse,
-          timestamp: new Date().toISOString(),
-        },
-      ]);
-      setIsTyping(false);
-    }, 1500);
-
-    // Uncomment this to use real API
-    // sendMessageMutation.mutate({ message, conversationId });
+    // Use real AI API
+    sendMessageMutation.mutate({ message, conversationId: null });
   };
 
   const handleKeyPress = e => {
@@ -115,37 +100,6 @@ const ChatPage = () => {
   const handleSuggestedQuestion = question => {
     setInputMessage(question);
     inputRef.current?.focus();
-  };
-
-  // Demo AI response generator
-  const generateAIResponse = message => {
-    const lowerMessage = message.toLowerCase();
-
-    if (lowerMessage.includes('spending') || lowerMessage.includes('expense')) {
-      return "I'd be happy to help you analyze your spending patterns! However, I don't see any transaction data in your account yet. To get personalized insights about your spending:\n\n1. Connect your bank accounts for automatic transaction sync\n2. Manually add transactions to track your expenses\n3. Upload financial documents for analysis\n\nOnce you have some transaction data, I can show you detailed spending breakdowns by category, trends over time, and personalized recommendations!";
-    }
-
-    if (lowerMessage.includes('save') || lowerMessage.includes('saving')) {
-      return "Great question about saving! To provide personalized savings insights, I need to see your financial data first. Here's how to get started:\n\n1. **Connect accounts** - Link your bank accounts to see your income and expenses\n2. **Set goals** - Define what you're saving for (emergency fund, vacation, etc.)\n3. **Track progress** - I'll help you monitor your savings rate and progress\n\nOnce you have some transaction data, I can calculate your savings rate, suggest improvements, and help you create a specific savings plan!";
-    }
-
-    if (lowerMessage.includes('budget') || lowerMessage.includes('plan')) {
-      return "I'd love to help you create a budget! To provide personalized budgeting recommendations, I need to analyze your income and spending patterns first.\n\n**To get started:**\n1. Connect your bank accounts or add transactions manually\n2. Let me analyze your spending patterns over the past few months\n3. I'll suggest budget categories and recommended amounts\n\nOnce you have some financial data in your account, I can create a detailed budget plan tailored to your specific situation!";
-    }
-
-    if (
-      lowerMessage.includes('investment') ||
-      lowerMessage.includes('invest')
-    ) {
-      return "I can help you with investment analysis! However, I don't see any investment account data yet. To get personalized investment insights:\n\n1. **Connect investment accounts** - Link your brokerage, 401(k), or IRA accounts\n2. **Upload statements** - Share investment documents for analysis\n3. **Set investment goals** - Define your risk tolerance and timeline\n\nOnce you have investment data in your account, I can analyze your portfolio allocation, performance, and provide personalized recommendations!";
-    }
-
-    if (lowerMessage.includes('debt') || lowerMessage.includes('loan')) {
-      return 'I can help you create a debt payoff strategy! To provide personalized debt management advice, I need to see your current debt situation.\n\n**How to get started:**\n1. Add your debt accounts (credit cards, loans, etc.)\n2. Include current balances and interest rates\n3. Share your monthly payment capacity\n\nOnce you have this information in your account, I can create a customized debt payoff plan with specific strategies to save money and pay off debt faster!';
-    }
-
-    // Default response
-    return "I'd be happy to help you with that! I can provide insights on your spending patterns, help you create budgets, analyze your financial goals, and answer questions about your accounts and transactions.\n\nTo get started, try:\n• Connecting your bank accounts\n• Adding some transactions manually\n• Uploading financial documents\n\nOnce you have some financial data, I can provide much more personalized and detailed advice!";
   };
 
   const suggestedQuestions = [
