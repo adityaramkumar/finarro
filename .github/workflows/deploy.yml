@@ -27,6 +27,10 @@ jobs:
             cd backend
             npm install --production
             
+            # Set production environment variables
+            # Update FRONTEND_URL for production
+            sed -i 's|FRONTEND_URL=.*|FRONTEND_URL=https://finarro.com|' .env
+            
             # Run database migrations
             npx knex migrate:latest --env production
             
