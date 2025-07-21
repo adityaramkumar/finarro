@@ -18,7 +18,12 @@ const dashboardRoutes = require('./routes/dashboard');
 const subscriptionRoutes = require('./routes/subscriptions');
 const sharesRoutes = require('./routes/shares');
 
+// Admin routes
+const adminAuthRoutes = require('./routes/admin/auth');
+const adminAnalyticsRoutes = require('./routes/admin/analytics');
+
 const { errorHandler, notFound } = require('./middleware/errorHandler');
+const { trackVisit } = require('./middleware/analytics');
 const logger = require('./config/logger');
 
 const app = express();
@@ -74,6 +79,23 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+// Session middleware for analytics
+const session = require('express-session');
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || 'analytics-session-secret',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    },
+  })
+);
+
+// Analytics tracking middleware
+app.use(trackVisit);
+
 // Logging
 app.use(
   morgan('combined', { stream: { write: message => logger.info(message) } })
@@ -108,6 +130,10 @@ app.use('/api/plaid', plaidRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
 app.use('/api/shares', sharesRoutes);
+
+// Admin API routes
+app.use('/api/admin/auth', adminAuthRoutes);
+app.use('/api/admin/analytics', adminAnalyticsRoutes);
 
 // Error handling middleware
 app.use(notFound);

@@ -9,6 +9,8 @@
     "test": "jest --passWithNoTests",
     "migrate": "knex migrate:latest",
     "seed": "knex seed:run",
+    "create-admin": "node scripts/create-admin.js",
+    "create-demo-data": "node scripts/create-demo-data.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "lint:check": "eslint . --max-warnings 0",

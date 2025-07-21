@@ -29,6 +29,7 @@ import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import TermsOfServicePage from './pages/TermsOfServicePage';
 import AboutPage from './pages/AboutPage';
 import SupportPage from './pages/SupportPage';
+import AdminDashboardPage from './pages/AdminDashboardPage';
 
 // Create a QueryClient instance
 const queryClient = new QueryClient({
@@ -63,6 +64,9 @@ function App() {
 
               {/* Public shared chart route */}
               <Route path="/share/:token" element={<SharedChartPage />} />
+
+              {/* Admin dashboard route (password protected within component) */}
+              <Route path="/admin" element={<AdminDashboardPage />} />
 
               {/* Protected routes with MainLayout */}
               <Route
