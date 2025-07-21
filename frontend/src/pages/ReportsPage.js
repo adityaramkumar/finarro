@@ -284,7 +284,7 @@ const ReportsPage = () => {
       )}
 
       {selectedReport === 'overview' && (
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
           {/* Net Worth Chart */}
           <div className="bg-gray-950/30 backdrop-blur border border-gray-800/50 rounded-2xl p-8 hover:border-gray-700/50 transition-all duration-300 hover:shadow-lg hover:shadow-green-500/5">
             <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
@@ -499,7 +499,7 @@ const ReportsPage = () => {
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
               {reportData.savingsGoals.map((goal, index) => (
                 <div
                   key={index}
@@ -536,7 +536,7 @@ const ReportsPage = () => {
       )}
 
       {/* Modern Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
         <div className="bg-gray-950/30 backdrop-blur border border-gray-800/50 rounded-2xl p-6 hover:bg-gray-950/50 hover:border-gray-700/50 transition-all duration-300 group hover:shadow-lg hover:shadow-green-500/5">
           <div className="flex items-center justify-between">
             <div>

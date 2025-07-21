@@ -528,7 +528,7 @@ const DocumentsPage = () => {
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500"></div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
           {filteredDocuments.map(doc => (
             <div
               key={doc.id}
@@ -670,7 +670,7 @@ const DocumentsPage = () => {
           </div>
           AI Document Analysis
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           <div className="bg-gray-800/40 backdrop-blur border border-gray-700/50 p-6 rounded-2xl hover:bg-gray-800/60 transition-all duration-300 hover:shadow-lg group">
             <div className="p-3 bg-green-500/10 rounded-xl inline-block mb-4 group-hover:bg-green-500/20 transition-colors">
               <FileText className="h-6 w-6 text-green-400" />

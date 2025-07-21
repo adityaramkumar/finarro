@@ -23,6 +23,7 @@ const MainLayout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showMobileSearch, setShowMobileSearch] = useState(false);
   const [subscriptionData, setSubscriptionData] = useState(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const { user, logout } = useAuth();
@@ -90,6 +91,7 @@ const MainLayout = ({ children }) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       toast.success(`Searching for: ${searchQuery}`);
+      setShowMobileSearch(false);
     } else {
       toast.error('Please enter a search term');
     }
@@ -106,6 +108,7 @@ const MainLayout = ({ children }) => {
       // Escape to close dropdowns
       if (e.key === 'Escape') {
         setProfileDropdownOpen(false);
+        setShowMobileSearch(false);
         setSearchQuery('');
       }
     };
@@ -127,22 +130,22 @@ const MainLayout = ({ children }) => {
       {/* Sidebar */}
       <div
         className={`
-        fixed inset-y-0 left-0 z-50 w-64 bg-gray-950 border-r border-gray-800 transform transition-transform duration-200 ease-in-out lg:translate-x-0 lg:static lg:inset-0
+        fixed inset-y-0 left-0 z-50 w-72 sm:w-80 lg:w-64 bg-gray-950 border-r border-gray-800 transform transition-transform duration-200 ease-in-out lg:translate-x-0 lg:static lg:inset-0
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `}
       >
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-gray-800">
           <Logo showText={true} />
           <button
             onClick={() => setSidebarOpen(false)}
-            className="lg:hidden text-gray-400 hover:text-white"
+            className="lg:hidden text-gray-400 hover:text-white p-2 rounded-lg hover:bg-gray-800 transition-colors"
           >
-            <X className="h-6 w-6" />
+            <X className="h-5 w-5" />
           </button>
         </div>
 
-        <nav className="mt-6 px-4">
-          <ul className="space-y-2">
+        <nav className="mt-6 px-3 sm:px-4">
+          <ul className="space-y-1">
             {navigation.map(item => {
               const isActive = location.pathname === item.href;
               return (
@@ -150,7 +153,7 @@ const MainLayout = ({ children }) => {
                   <Link
                     to={item.href}
                     className={`
-                      flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors
+                      flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-colors touch-manipulation
                       ${
                         isActive
                           ? 'bg-indigo-600 text-white shadow-lg'
@@ -159,8 +162,8 @@ const MainLayout = ({ children }) => {
                     `}
                     onClick={() => setSidebarOpen(false)}
                   >
-                    <item.icon className="h-5 w-5 mr-3" />
-                    {item.name}
+                    <item.icon className="h-5 w-5 mr-3 flex-shrink-0" />
+                    <span className="truncate">{item.name}</span>
                   </Link>
                 </li>
               );
@@ -170,15 +173,15 @@ const MainLayout = ({ children }) => {
 
         {/* Upgrade card - only show for free tier users */}
         {(!subscriptionData || subscriptionData?.tier === 'free') && (
-          <div className="absolute bottom-4 left-4 right-4">
+          <div className="absolute bottom-4 left-3 right-3 sm:left-4 sm:right-4">
             <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg p-4 text-white">
               <h3 className="font-semibold text-sm mb-1">Upgrade to Pro</h3>
-              <p className="text-xs opacity-90 mb-3">
+              <p className="text-xs opacity-90 mb-3 leading-relaxed">
                 Get unlimited AI insights and advanced features
               </p>
               <button
                 onClick={() => setShowUpgradeModal(true)}
-                className="w-full bg-white text-indigo-600 text-sm font-medium py-2 px-4 rounded-md hover:bg-gray-100 transition-colors"
+                className="w-full bg-white text-indigo-600 text-sm font-medium py-2.5 px-4 rounded-md hover:bg-gray-100 transition-colors touch-manipulation"
               >
                 Upgrade Now
               </button>
@@ -190,16 +193,17 @@ const MainLayout = ({ children }) => {
       {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="bg-gray-950 border-b border-gray-800 px-6 py-4">
+        <header className="bg-gray-950 border-b border-gray-800 px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center">
+            <div className="flex items-center space-x-3">
               <button
                 onClick={() => setSidebarOpen(true)}
-                className="lg:hidden text-gray-400 hover:text-white mr-4"
+                className="lg:hidden text-gray-400 hover:text-white p-2 rounded-lg hover:bg-gray-800 transition-colors touch-manipulation"
               >
-                <Menu className="h-6 w-6" />
+                <Menu className="h-5 w-5" />
               </button>
 
+              {/* Desktop Search */}
               <div className="hidden md:flex">
                 <form onSubmit={handleSearch} className="relative group">
                   <div className="relative">
@@ -223,12 +227,20 @@ const MainLayout = ({ children }) => {
                   </div>
                 </form>
               </div>
+
+              {/* Mobile Search Button */}
+              <button
+                onClick={() => setShowMobileSearch(true)}
+                className="md:hidden text-gray-400 hover:text-white p-2 rounded-lg hover:bg-gray-800 transition-colors touch-manipulation"
+              >
+                <Search className="h-5 w-5" />
+              </button>
             </div>
 
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 sm:space-x-4">
               {/* Notifications */}
-              <button className="relative text-gray-400 hover:text-white transition-colors group">
-                <Bell className="h-6 w-6 group-hover:animate-pulse" />
+              <button className="relative text-gray-400 hover:text-white transition-colors group p-2 rounded-lg hover:bg-gray-800 touch-manipulation">
+                <Bell className="h-5 w-5 group-hover:animate-pulse" />
                 <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full animate-ping"></span>
                 <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full"></span>
               </button>
@@ -237,12 +249,12 @@ const MainLayout = ({ children }) => {
               <div className="relative">
                 <button
                   onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                  className="flex items-center space-x-3 text-gray-300 hover:text-white"
+                  className="flex items-center space-x-2 sm:space-x-3 text-gray-300 hover:text-white p-2 rounded-lg hover:bg-gray-800 transition-colors touch-manipulation"
                 >
-                  <div className="h-8 w-8 bg-indigo-600 rounded-full flex items-center justify-center">
+                  <div className="h-8 w-8 bg-indigo-600 rounded-full flex items-center justify-center flex-shrink-0">
                     <User className="h-4 w-4 text-white" />
                   </div>
-                  <span className="hidden md:block font-medium">
+                  <span className="hidden sm:block font-medium truncate max-w-32">
                     {user?.first_name} {user?.last_name}
                   </span>
                 </button>
@@ -251,7 +263,7 @@ const MainLayout = ({ children }) => {
                   <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg border border-gray-700 py-1 z-50">
                     <Link
                       to="/settings"
-                      className="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white"
+                      className="flex items-center px-4 py-3 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors touch-manipulation"
                       onClick={() => setProfileDropdownOpen(false)}
                     >
                       <Settings className="h-4 w-4 mr-2" />
@@ -259,7 +271,7 @@ const MainLayout = ({ children }) => {
                     </Link>
                     <button
                       onClick={handleLogout}
-                      className="flex items-center w-full px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white"
+                      className="flex items-center w-full px-4 py-3 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors touch-manipulation"
                     >
                       <LogOut className="h-4 w-4 mr-2" />
                       Logout
@@ -269,10 +281,34 @@ const MainLayout = ({ children }) => {
               </div>
             </div>
           </div>
+
+          {/* Mobile Search Overlay */}
+          {showMobileSearch && (
+            <div className="md:hidden mt-4 animate-in slide-in-from-top-2 duration-200">
+              <form onSubmit={handleSearch} className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 z-10" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  placeholder="Search transactions & accounts"
+                  className="w-full bg-gray-800/50 backdrop-blur text-white placeholder-gray-400 pl-10 pr-12 py-3 rounded-xl border border-gray-600/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent focus:bg-gray-800 transition-all"
+                  autoFocus
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowMobileSearch(false)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors z-10"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </form>
+            </div>
+          )}
         </header>
 
         {/* Main content area */}
-        <main className="flex-1 overflow-y-auto bg-gray-900 p-6">
+        <main className="flex-1 overflow-y-auto bg-gray-900 p-3 sm:p-4 lg:p-6">
           {children}
         </main>
       </div>

@@ -37,6 +37,7 @@ const DashboardPage = () => {
   const [isSharing, setIsSharing] = useState(false);
   const [shareUrl, setShareUrl] = useState('');
   const [copied, setCopied] = useState(false);
+  const [showAllAccounts, setShowAllAccounts] = useState(false);
 
   // Fetch dashboard data from API
   const { data: dashboardData, isLoading } = useQuery(
@@ -51,10 +52,19 @@ const DashboardPage = () => {
 
   const data = dashboardData?.data || {};
   const summary = data.summary || {};
-  const accounts = data.accounts || [];
+  const allAccounts = data.accounts || [];
   const transactions = data.transactions || [];
   const spendingByCategory = data.spending_by_category || [];
   const netWorthData = data.net_worth_data || [];
+
+  // Sort accounts by balance (highest first) and show top 5 or all based on toggle
+  const sortedAccounts = [...allAccounts].sort(
+    (a, b) => (b.balance || 0) - (a.balance || 0)
+  );
+  const accounts = showAllAccounts
+    ? sortedAccounts
+    : sortedAccounts.slice(0, 5);
+  const hasMoreAccounts = sortedAccounts.length > 5;
 
   // Handle successful Plaid connection
   const handlePlaidSuccess = () => {
@@ -80,7 +90,7 @@ const DashboardPage = () => {
   }
 
   // Helper to check if we have any real data
-  const hasData = accounts.length > 0;
+  const hasData = allAccounts.length > 0;
 
   // Helper function for currency formatting
   const formatCurrency = amount => {
@@ -158,26 +168,26 @@ const DashboardPage = () => {
   return (
     <div className="space-y-8 animate-fade-in">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-4xl font-bold text-white">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 lg:gap-6 mb-6 lg:mb-8">
+        <div className="text-center sm:text-left">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">
             Welcome back,{' '}
             <span className="text-transparent bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text">
               {user?.first_name}
             </span>
             !
           </h1>
-          <p className="text-gray-400 mt-3 text-xl">
+          <p className="text-gray-400 mt-2 sm:mt-3 text-lg sm:text-xl">
             Here's your financial overview for today
           </p>
         </div>
-        <div className="flex items-center space-x-4">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 lg:flex-shrink-0">
           <select
             value={timeframe}
             onChange={e => {
               setTimeframe(e.target.value);
             }}
-            className="bg-gray-800/50 backdrop-blur text-white border border-gray-600/50 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all hover:bg-gray-800/70 cursor-pointer"
+            className="bg-gray-800/50 backdrop-blur text-white border border-gray-600/50 rounded-xl px-4 py-3 sm:py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all hover:bg-gray-800/70 cursor-pointer touch-manipulation"
           >
             <option value="7d">Last 7 days</option>
             <option value="30d">Last 30 days</option>
@@ -185,7 +195,7 @@ const DashboardPage = () => {
             <option value="1y">Last year</option>
           </select>
           <PlaidLink onSuccess={handlePlaidSuccess} onError={handlePlaidError}>
-            <button className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-2.5 rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 flex items-center space-x-2 shadow-lg hover:shadow-xl hover:shadow-indigo-500/25 hover:scale-105 active:scale-95">
+            <button className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-3 sm:py-2.5 rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl hover:shadow-indigo-500/25 hover:scale-105 active:scale-95 touch-manipulation">
               <Plus className="h-4 w-4" />
               <span>Add Account</span>
             </button>
@@ -194,7 +204,7 @@ const DashboardPage = () => {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 2xl:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4 lg:gap-6">
         <div className="bg-gray-950/30 backdrop-blur border border-gray-800/50 rounded-2xl p-4 hover:bg-gray-950/50 hover:border-gray-700/50 transition-all duration-300 group hover:shadow-lg hover:shadow-green-500/5">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
@@ -607,7 +617,7 @@ const DashboardPage = () => {
       </div>
 
       {/* Secondary Charts Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Financial Breakdown */}
         <div className="bg-gray-950/30 backdrop-blur border border-gray-800/50 rounded-2xl p-6">
           <h3 className="text-lg font-semibold text-white mb-6">
@@ -719,7 +729,7 @@ const DashboardPage = () => {
                 </ResponsiveContainer>
               </div>
               <div className="flex-1 ml-8">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   {spendingByCategory.map((category, index) => (
                     <div
                       key={index}
@@ -747,14 +757,19 @@ const DashboardPage = () => {
       </div>
 
       {/* Bottom Section: Accounts and Transactions */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Accounts */}
         <div className="bg-gray-950/30 backdrop-blur border border-gray-800/50 rounded-2xl p-6">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-semibold text-white">Your Accounts</h3>
-            <button className="text-indigo-400 hover:text-indigo-300 text-sm font-medium transition-colors hover:underline">
-              View All
-            </button>
+            {hasMoreAccounts && (
+              <button
+                onClick={() => setShowAllAccounts(!showAllAccounts)}
+                className="text-indigo-400 hover:text-indigo-300 text-sm font-medium transition-colors hover:underline"
+              >
+                {showAllAccounts ? 'Show Less' : 'View All'}
+              </button>
+            )}
           </div>
           {!hasData ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">

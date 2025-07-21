@@ -376,7 +376,7 @@ const SettingsPage = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
         {/* Modern Sidebar */}
         <div className="lg:col-span-1">
           <div className="bg-gray-950/30 backdrop-blur border border-gray-800/50 rounded-2xl p-6 shadow-lg">
@@ -410,7 +410,7 @@ const SettingsPage = () => {
                 Profile Information
               </h2>
               <form onSubmit={handleProfileUpdate} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                   <div>
                     <label className="block text-sm font-bold text-gray-300 mb-3">
                       First Name
