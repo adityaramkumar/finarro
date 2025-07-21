@@ -22,6 +22,8 @@ import SubscriptionUpgrade from '../components/SubscriptionUpgrade';
 const MainLayout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [notificationDropdownOpen, setNotificationDropdownOpen] =
+    useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const [subscriptionData, setSubscriptionData] = useState(null);
@@ -29,6 +31,25 @@ const MainLayout = ({ children }) => {
   const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+
+  // Mock notifications data - replace with API call later
+  const [notifications] = useState([
+    // Example notifications - remove or replace with real data
+    // {
+    //   id: 1,
+    //   title: 'Account Connected',
+    //   message: 'Successfully linked your Chase checking account',
+    //   time: '2 hours ago',
+    //   read: false,
+    // },
+    // {
+    //   id: 2,
+    //   title: 'Monthly Report Ready',
+    //   message: 'Your financial report for January is now available',
+    //   time: '1 day ago',
+    //   read: true,
+    // },
+  ]);
 
   // Load subscription data
   useEffect(() => {
@@ -97,7 +118,7 @@ const MainLayout = ({ children }) => {
     }
   };
 
-  // Add keyboard shortcuts
+  // Add keyboard shortcuts and click outside handlers
   React.useEffect(() => {
     const handleKeyDown = e => {
       // Ctrl/Cmd + K to focus search
@@ -108,13 +129,28 @@ const MainLayout = ({ children }) => {
       // Escape to close dropdowns
       if (e.key === 'Escape') {
         setProfileDropdownOpen(false);
+        setNotificationDropdownOpen(false);
         setShowMobileSearch(false);
         setSearchQuery('');
       }
     };
 
+    const handleClickOutside = e => {
+      // Close dropdowns when clicking outside
+      if (!e.target.closest('[data-dropdown="profile"]')) {
+        setProfileDropdownOpen(false);
+      }
+      if (!e.target.closest('[data-dropdown="notifications"]')) {
+        setNotificationDropdownOpen(false);
+      }
+    };
+
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener('click', handleClickOutside);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('click', handleClickOutside);
+    };
   }, []);
 
   return (
@@ -239,14 +275,84 @@ const MainLayout = ({ children }) => {
 
             <div className="flex items-center space-x-2 sm:space-x-4">
               {/* Notifications */}
-              <button className="relative text-gray-400 hover:text-white transition-colors group p-2 rounded-lg hover:bg-gray-800 touch-manipulation">
-                <Bell className="h-5 w-5 group-hover:animate-pulse" />
-                <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full animate-ping"></span>
-                <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full"></span>
-              </button>
+              <div className="relative" data-dropdown="notifications">
+                <button
+                  onClick={() =>
+                    setNotificationDropdownOpen(!notificationDropdownOpen)
+                  }
+                  className="relative text-gray-400 hover:text-white transition-colors group p-2 rounded-lg hover:bg-gray-800 touch-manipulation"
+                >
+                  <Bell className="h-5 w-5 group-hover:animate-pulse" />
+                  {notifications.some(n => !n.read) && (
+                    <>
+                      <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full animate-ping"></span>
+                      <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full"></span>
+                    </>
+                  )}
+                </button>
+
+                {/* Notifications dropdown */}
+                {notificationDropdownOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-80 bg-gray-900 border border-gray-700/50 rounded-xl shadow-xl z-50 backdrop-blur">
+                    <div className="p-4 border-b border-gray-700/50">
+                      <h3 className="text-lg font-semibold text-white">
+                        Notifications
+                      </h3>
+                    </div>
+
+                    {notifications.length === 0 ? (
+                      <div className="p-6 text-center">
+                        <Bell className="h-12 w-12 text-gray-500 mx-auto mb-3" />
+                        <h4 className="text-white font-medium mb-1">
+                          No notifications
+                        </h4>
+                        <p className="text-gray-400 text-sm">
+                          You're all caught up! Check back later for updates.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="max-h-96 overflow-y-auto">
+                        {notifications.map(notification => (
+                          <div
+                            key={notification.id}
+                            className={`p-4 border-b border-gray-700/30 hover:bg-gray-800/50 transition-colors ${
+                              !notification.read ? 'bg-gray-800/30' : ''
+                            }`}
+                          >
+                            <div className="flex items-start space-x-3">
+                              {!notification.read && (
+                                <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                              )}
+                              <div className="flex-1 min-w-0">
+                                <h4 className="text-white font-medium text-sm mb-1">
+                                  {notification.title}
+                                </h4>
+                                <p className="text-gray-400 text-sm mb-2">
+                                  {notification.message}
+                                </p>
+                                <p className="text-gray-500 text-xs">
+                                  {notification.time}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {notifications.length > 0 && (
+                      <div className="p-4 border-t border-gray-700/50">
+                        <button className="w-full text-center text-indigo-400 hover:text-indigo-300 text-sm transition-colors">
+                          View all notifications
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
 
               {/* Profile dropdown */}
-              <div className="relative">
+              <div className="relative" data-dropdown="profile">
                 <button
                   onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
                   className="flex items-center space-x-2 sm:space-x-3 text-gray-300 hover:text-white p-2 rounded-lg hover:bg-gray-800 transition-colors touch-manipulation"

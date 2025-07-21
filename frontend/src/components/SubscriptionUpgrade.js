@@ -153,7 +153,7 @@ const SubscriptionUpgrade = ({ isOpen, onClose, onSuccess }) => {
   // Check if Stripe is configured
   if (!process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY) {
     return (
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-60 p-4">
         <div className="bg-gray-900 border border-gray-700/50 rounded-2xl p-8 max-w-md w-full relative">
           <button
             onClick={onClose}
@@ -186,7 +186,7 @@ const SubscriptionUpgrade = ({ isOpen, onClose, onSuccess }) => {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-60 p-4">
       <div className="bg-gray-900 border border-gray-700/50 rounded-2xl p-8 max-w-md w-full relative">
         <button
           onClick={onClose}
